@@ -50,6 +50,10 @@ For real lens modelling, use [lenstronomy](https://github.com/lenstronomy/lenstr
 
 Hubble Ultra Deep Field: NASA, ESA, S. Beckwith (STScI) and the HUDF Team.
 
+The equations are set in native MathML with an inlined subset of [STIX Two Math](https://github.com/stipub/stixfonts) (SIL Open Font License, see [LICENSE-STIXTwoMath.txt](LICENSE-STIXTwoMath.txt)).
+
+The stars behind the page are ray-traced too. A few invisible point masses drift across them, and one follows your pointer.
+
 ## Licence
 
-MIT. See [LICENSE](LICENSE). The HUDF image is not covered by it. See the credit above.
+MIT. See [LICENSE](LICENSE). The HUDF image and the math font are not covered by it. See the credits above.
