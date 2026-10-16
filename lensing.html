@@ -1,0 +1,1074 @@
+<!--
+Gravitational Lensing
+Feel free to embed this demo on your own site! Click the clipboard button at bottom right to copy the embed code!
+HTML code by Allan G. Schweinfurth 
+HST image credit: NASA, ESA, S. Beckwith (STScI) and the HUDF Team
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Gravitational Lensing</title>
+  <style>
+    :root {
+      --bg: #0a0d13;
+      --panel: rgba(22, 27, 38, 0.85);
+      --border: #2a3346;
+      --text: #e8ecf4;
+      --muted: #8b94a7;
+      --accent: #7ab4f5;
+      --accent-bright: #9ac8ff;
+      --track: #2a3140;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: radial-gradient(1200px 800px at 50% -10%, #151d2e 0%, var(--bg) 60%) fixed;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    header { text-align: center; margin: 18px 12px 6px; }
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      background: linear-gradient(90deg, #cfe2ff, #7ab4f5);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    header p { margin: 4px 0 0; font-size: 12.5px; color: var(--muted); }
+
+    .stage { display: flex; flex-direction: column; align-items: center; }
+    .stage:fullscreen {
+      background: #000;
+      justify-content: center;
+    }
+    .stage:fullscreen canvas {
+      width: min(100vmin, 100%);
+      height: min(100vmin, 100%);
+      margin: 0;
+      border: none;
+      border-radius: 0;
+    }
+    .stage:fullscreen .status { position: absolute; bottom: 12px; }
+
+    canvas {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin: 10px;
+      touch-action: none;
+      max-width: 100%;
+      height: auto;
+      box-shadow: 0 0 60px rgba(80, 140, 240, 0.10), 0 4px 30px rgba(0, 0, 0, 0.5);
+      background: #000;
+    }
+
+    .status {
+      color: var(--muted);
+      margin: 2px 10px 8px;
+      font-size: 13px;
+      text-align: center;
+      min-height: 18px;
+    }
+    .status kbd {
+      background: #1d2432;
+      border: 1px solid var(--border);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      padding: 0 5px;
+      font-size: 11px;
+      font-family: inherit;
+      color: var(--text);
+    }
+
+    .toolbar { display: flex; gap: 8px; align-items: center; margin: 2px 0 8px; flex-wrap: wrap; justify-content: center; }
+
+    .btn {
+      background: var(--panel);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-family: inherit;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .btn:hover { border-color: #4a5a78; color: var(--text); }
+    .btn.active { border-color: var(--accent); color: var(--accent-bright); background: rgba(122, 180, 245, 0.10); }
+
+    .controls-wrap {
+      overflow: hidden;
+      max-height: 400px;
+      transition: max-height 0.35s ease, opacity 0.3s ease, margin 0.3s ease;
+      opacity: 1;
+      margin-bottom: 60px;
+    }
+    .controls-wrap.collapsed { max-height: 0; opacity: 0; margin-bottom: 20px; }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin: 4px 10px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 820px;
+    }
+
+    .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; }
+
+    .row-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-right: 2px; }
+
+    .chip {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: inherit;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .chip:hover { border-color: #4a5a78; color: var(--text); }
+    .chip.active { border-color: var(--accent); color: var(--accent-bright); background: rgba(122, 180, 245, 0.12); }
+
+    .sliders { display: flex; gap: 1.4em; flex-wrap: wrap; justify-content: center; }
+
+    label.slider {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      font-size: 12px;
+      min-width: 160px;
+      color: var(--muted);
+      transition: opacity 0.2s;
+    }
+    label.slider.disabled { opacity: 0.35; pointer-events: none; }
+    .lab-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .val {
+      background: #1a2130;
+      border: 1px solid var(--border);
+      color: var(--accent-bright);
+      padding: 1px 9px;
+      border-radius: 10px;
+      font-variant-numeric: tabular-nums;
+      font-size: 11.5px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 170px;
+      max-width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--accent) var(--fill, 50%), var(--track) var(--fill, 50%));
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #cfe2ff;
+      border: 2px solid var(--accent);
+      cursor: pointer;
+      transition: transform 0.12s, background 0.15s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); background: #fff; }
+    input[type="range"]::-moz-range-thumb {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #cfe2ff;
+      border: 2px solid var(--accent);
+      cursor: pointer;
+    }
+    input[type="range"]:disabled { opacity: 0.4; cursor: not-allowed; }
+    input[type="range"]:disabled::-webkit-slider-thumb { cursor: not-allowed; }
+
+    .toggles { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; }
+    label.toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    label.toggle:hover { color: var(--text); }
+    label.toggle input { display: none; }
+    .switch {
+      position: relative;
+      width: 34px;
+      height: 18px;
+      background: var(--track);
+      border-radius: 9px;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #dfe6f2;
+      transition: transform 0.2s;
+    }
+    label.toggle input:checked + .switch { background: var(--accent); }
+    label.toggle input:checked + .switch::after { transform: translateX(16px); }
+
+    #embedBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid #445068;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: inherit;
+      transition: all 0.2s;
+      z-index: 1000;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    #embedBtn:hover { background: rgba(45, 55, 75, 0.95); border-color: #6a7a98; }
+    #embedBtn.copied { background: rgba(40, 130, 60, 0.9); border-color: #5a5; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 8, 14, 0.7);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+    .modal-backdrop[hidden] { display: none; }
+    .modal {
+      background: #141a26;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      max-width: 540px;
+      max-height: 82vh;
+      overflow-y: auto;
+      padding: 22px 26px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: #c6cede;
+      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.6);
+    }
+    .modal h2 { margin: 0 0 10px; font-size: 17px; color: var(--text); }
+    .modal h3 { margin: 16px 0 6px; font-size: 13.5px; color: var(--accent-bright); }
+    .modal p { margin: 6px 0; }
+    .modal ul { margin: 6px 0; padding-left: 20px; }
+    .modal li { margin: 3px 0; }
+    .modal kbd {
+      background: #1d2432;
+      border: 1px solid var(--border);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      padding: 0 5px;
+      font-size: 11px;
+      font-family: inherit;
+      color: var(--text);
+    }
+    .modal-close {
+      float: right;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 0 4px 10px;
+    }
+    .modal-close:hover { color: var(--text); }
+
+    .video-panel { align-items: center; width: 100%; }
+    .video-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 760px;
+      min-width: 280px;
+      aspect-ratio: 16 / 9;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #000;
+    }
+    .video-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    @media (max-width: 850px) {
+      canvas { width: calc(100vw - 20px); height: calc(100vw - 20px); max-width: 600px; max-height: 600px; }
+      .panel { font-size: 11px; padding: 12px; }
+      label.slider { min-width: 130px; }
+      input[type="range"] { width: 130px; }
+      header h1 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Gravitational Lensing</h1>
+    <p>Warp the Hubble Ultra Deep Field with a movable gravitational lens</p>
+  </header>
+
+  <div class="stage" id="stage">
+    <canvas id="lensCanvas" width="800" height="800"></canvas>
+    <div class="status" id="status">Loading&hellip;</div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn" id="controlsToggle">&#9650; Hide controls</button>
+    <button class="btn" id="orbitBtn">&#9654; Orbit</button>
+    <button class="btn" id="resetBtn">&#8635; Reset</button>
+    <button class="btn" id="fullscreenBtn" title="Fullscreen">&#x26F6; Fullscreen</button>
+    <button class="btn" id="infoBtn" title="About this demo">? Info</button>
+  </div>
+
+  <div class="controls-wrap" id="controlsWrap">
+    <div class="panel">
+      <div class="row" id="presetRow">
+        <span class="row-label">Presets</span>
+        <button class="chip" data-preset="0">Galaxy</button>
+        <button class="chip" data-preset="1">Galaxy Cluster</button>
+      </div>
+
+      <div class="sliders">
+        <label class="slider">
+          <span class="lab-row">Einstein radius (mass) <span class="val" id="radiusValue">50</span></span>
+          <input id="radius" type="range" min="10" max="250" value="50">
+        </label>
+        <label class="slider" id="ellipticityLabel">
+          <span class="lab-row">Ellipticity <span class="val" id="ellipticityValue">0.00</span></span>
+          <input id="ellipticity" type="range" min="0" max="0.6" step="0.05" value="0.0">
+        </label>
+        <label class="slider disabled" id="posAngleLabel">
+          <span class="lab-row">Position angle <span class="val" id="posAngleValue">0&deg;</span></span>
+          <input id="posAngle" type="range" min="0" max="180" step="5" value="0" disabled>
+        </label>
+      </div>
+
+      <div class="toggles">
+        <label class="toggle"><input type="checkbox" id="showLens" checked><span class="switch"></span>Lens light</label>
+        <label class="toggle"><input type="checkbox" id="showPreview" checked><span class="switch"></span>Source preview</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel video-panel">
+    <span class="row-label">Related video</span>
+    <div class="video-wrap">
+      <iframe
+        src="https://www.youtube.com/embed/MP5gGr-ilBA"
+        title="YouTube video player"
+        loading="lazy"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-policy"
+        allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <button id="embedBtn" title="Copy embed code">&#128203; Embed</button>
+
+  <div class="modal-backdrop" id="infoModal" hidden>
+    <div class="modal">
+      <button class="modal-close" id="infoClose" aria-label="Close">&times;</button>
+      <h2>What am I seeing?</h2>
+      <p>Massive objects bend the path of light passing near them &mdash; a prediction of Einstein&rsquo;s general relativity called <b>gravitational lensing</b>. This demo places a simulated lens (like a galaxy or dark-matter halo) in front of the Hubble Ultra Deep Field and ray-traces every pixel in real time.</p>
+      <h3>The controls</h3>
+      <ul>
+        <li><b>Einstein radius</b> sets the lens mass. Sources directly behind the lens are smeared into rings and arcs at this radius.</li>
+        <li><b>Ellipticity</b> flattens the lens (like a real elliptical galaxy), splitting the ring into multiple arcs. The yellow curve in the preview is the <b>caustic</b> &mdash; sources inside it are multiply imaged.</li>
+        <li><b>Position angle</b> rotates the flattened lens.</li>
+        <li>The <b>Galaxy Cluster</b> preset sums the deflection from several member galaxies at fixed relative positions &mdash; drag to move the whole cluster, and Einstein radius scales its total mass. Ellipticity/position angle are fixed per member in this mode.</li>
+      </ul>
+      <h3>Interactions</h3>
+      <ul>
+        <li>Move the mouse (or drag a finger) to place the lens; <b>scroll</b> or <b>pinch</b> to change its mass.</li>
+        <li><kbd>Space</kbd> or click / two-finger tap &mdash; lock &amp; unlock the lens</li>
+        <li><kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd> &mdash; nudge the lens &middot; <kbd>+</kbd>/<kbd>&minus;</kbd> &mdash; change mass</li>
+        <li><kbd>A</kbd> orbit &middot; <kbd>R</kbd> reset &middot; <kbd>H</kbd> hide controls &middot; <kbd>I</kbd> this info</li>
+      </ul>
+      <p style="color:#8b94a7; font-size:12px; margin-top:14px;">Image: NASA, ESA, S. Beckwith (STScI) and the HUDF Team. Lens model: singular isothermal sphere/ellipsoid, linearly summed across members in cluster mode.</p>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("lensCanvas");
+    const ctx = canvas.getContext("2d");
+    const statusEl = document.getElementById("status");
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = "./HST_UDF.jpg";
+
+    const DEFAULTS = { einsteinR: 50, ellipticity: 0.0, posAngle: 0 };
+    const PRESETS = [
+      { r: 90, e: 0.25, pa: 45, cluster: false },   // Galaxy
+      { r: 60, e: 0.0,  pa: 0,  cluster: true  },   // Galaxy Cluster
+    ];
+
+    // Member galaxies for the "Galaxy Cluster" preset: relative (dx, dy) offsets from the
+    // draggable cluster center, each with its own Einstein radius, ellipticity and position
+    // angle. CLUSTER_REF_R anchors the mass-scale factor applied when the radius slider moves.
+    const CLUSTER_REF_R = 60;
+    const CLUSTER_MEMBERS = [
+      { dx: 0,    dy: 0,   r: 60, e: 0.15, pa: 15  },   // central cD galaxy
+      { dx: -130, dy: -70, r: 34, e: 0.30, pa: 100 },
+      { dx: 110,  dy: -95, r: 30, e: 0.20, pa: 55  },
+      { dx: -90,  dy: 110, r: 32, e: 0.25, pa: 140 },
+      { dx: 140,  dy: 80,  r: 26, e: 0.15, pa: 70  },
+    ];
+
+    let lens = { x: canvas.width / 2, y: canvas.height / 2 };
+    let einsteinR = DEFAULTS.einsteinR;
+    let ellipticity = DEFAULTS.ellipticity;
+    let posAngle = DEFAULTS.posAngle;
+    let clusterMode = false;
+    let imageLoaded = false;
+    let sourceImageData = null;
+    let outputImageData = null;
+    let isLocked = false;
+    let rafId = null;
+    let lastTouchTime = 0;
+
+    let showLens = true;
+    let showPreview = true;
+    let animating = false;
+    let orbitRaf = null;
+
+    // Reused across frames to avoid per-frame allocation
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+
+    const radiusSlider = document.getElementById("radius");
+    const ellipticitySlider = document.getElementById("ellipticity");
+    const ellipticityLabel = document.getElementById("ellipticityLabel");
+    const posAngleSlider = document.getElementById("posAngle");
+    const posAngleLabel = document.getElementById("posAngleLabel");
+    const radiusValue = document.getElementById("radiusValue");
+    const ellipticityValue = document.getElementById("ellipticityValue");
+    const posAngleValue = document.getElementById("posAngleValue");
+    const orbitBtn = document.getElementById("orbitBtn");
+    const presetChips = Array.from(document.querySelectorAll('.chip[data-preset]'));
+
+    function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
+
+    function updateFill(slider) {
+      const min = +slider.min, max = +slider.max;
+      const pct = ((+slider.value - min) / (max - min)) * 100;
+      slider.style.setProperty('--fill', pct + '%');
+    }
+
+    function updateSliderStates() {
+      const disablePosAngle = ellipticity < 0.01 || clusterMode;
+      posAngleSlider.disabled = disablePosAngle;
+      posAngleLabel.classList.toggle('disabled', disablePosAngle);
+      ellipticitySlider.disabled = clusterMode;
+      ellipticityLabel.classList.toggle('disabled', clusterMode);
+    }
+
+    function syncUI() {
+      radiusSlider.value = einsteinR;
+      ellipticitySlider.value = ellipticity;
+      posAngleSlider.value = posAngle;
+      radiusValue.textContent = Math.round(einsteinR);
+      ellipticityValue.textContent = (+ellipticity).toFixed(2);
+      posAngleValue.textContent = posAngle + '°';
+      [radiusSlider, ellipticitySlider, posAngleSlider].forEach(updateFill);
+      updateSliderStates();
+    }
+
+    function clearActivePreset() {
+      presetChips.forEach(c => c.classList.remove('active'));
+    }
+
+    function setRadius(v) {
+      einsteinR = clamp(Math.round(v), 10, 250);
+      clearActivePreset();
+      syncUI();
+      scheduleDraw();
+    }
+
+    radiusSlider.addEventListener('input', e => {
+      einsteinR = +e.target.value;
+      clearActivePreset();
+      syncUI();
+      scheduleDraw();
+    });
+    ellipticitySlider.addEventListener('input', e => {
+      ellipticity = +e.target.value;
+      clearActivePreset();
+      syncUI();
+      scheduleDraw();
+    });
+    posAngleSlider.addEventListener('input', e => {
+      posAngle = +e.target.value;
+      clearActivePreset();
+      syncUI();
+      scheduleDraw();
+    });
+
+    presetChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const p = PRESETS[+chip.dataset.preset];
+        einsteinR = p.r;
+        ellipticity = p.e;
+        posAngle = p.pa;
+        clusterMode = p.cluster;
+        clearActivePreset();
+        chip.classList.add('active');
+        syncUI();
+        scheduleDraw();
+      });
+    });
+
+    function resetAll() {
+      stopOrbit();
+      einsteinR = DEFAULTS.einsteinR;
+      ellipticity = DEFAULTS.ellipticity;
+      posAngle = DEFAULTS.posAngle;
+      clusterMode = false;
+      lens.x = canvas.width / 2;
+      lens.y = canvas.height / 2;
+      clearActivePreset();
+      if (isLocked) setLocked(false);
+      syncUI();
+      scheduleDraw();
+    }
+    document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+    // Overlay toggles
+    document.getElementById('showLens').addEventListener('change', e => { showLens = e.target.checked; scheduleDraw(); });
+    document.getElementById('showPreview').addEventListener('change', e => { showPreview = e.target.checked; scheduleDraw(); });
+
+    // Collapsible controls
+    const controlsWrap = document.getElementById("controlsWrap");
+    const toggleBtn = document.getElementById("controlsToggle");
+    function toggleControls() {
+      const collapsed = controlsWrap.classList.toggle("collapsed");
+      toggleBtn.innerHTML = collapsed ? "&#9660; Show controls" : "&#9650; Hide controls";
+    }
+    toggleBtn.addEventListener("click", toggleControls);
+
+    // Fullscreen
+    const stage = document.getElementById('stage');
+    document.getElementById('fullscreenBtn').addEventListener('click', () => {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else if (stage.requestFullscreen) stage.requestFullscreen();
+    });
+
+    // Info modal
+    const infoModal = document.getElementById('infoModal');
+    document.getElementById('infoBtn').addEventListener('click', () => { infoModal.hidden = false; });
+    document.getElementById('infoClose').addEventListener('click', () => { infoModal.hidden = true; });
+    infoModal.addEventListener('click', e => { if (e.target === infoModal) infoModal.hidden = true; });
+
+    // Auto-orbit: the lens drifts along a Lissajous path
+    function orbitStep(ts) {
+      if (!animating) return;
+      const t = ts / 1000;
+      const cx = canvas.width / 2, cy = canvas.height / 2;
+      lens.x = cx + canvas.width  * 0.32 * Math.sin(t * 0.45);
+      lens.y = cy + canvas.height * 0.32 * Math.sin(t * 0.33 + 1.7);
+      draw();
+      orbitRaf = requestAnimationFrame(orbitStep);
+    }
+    function startOrbit() {
+      if (!imageLoaded || animating) return;
+      animating = true;
+      if (isLocked) { isLocked = false; }
+      orbitBtn.innerHTML = "&#9646;&#9646; Stop orbit";
+      orbitBtn.classList.add('active');
+      setStatus('Auto-orbit &mdash; move your mouse over the image to take control.');
+      orbitRaf = requestAnimationFrame(orbitStep);
+    }
+    function stopOrbit() {
+      if (!animating) return;
+      animating = false;
+      cancelAnimationFrame(orbitRaf);
+      orbitBtn.innerHTML = "&#9654; Orbit";
+      orbitBtn.classList.remove('active');
+      setStatus(defaultHint());
+    }
+    orbitBtn.addEventListener('click', () => animating ? stopOrbit() : startOrbit());
+
+    function defaultHint() {
+      return isLocked
+        ? 'Lens locked &mdash; click or press <kbd>Space</kbd> to unlock.'
+        : 'Move to place the lens &middot; scroll to change mass &middot; <kbd>Space</kbd> to lock &middot; <kbd>I</kbd> for info';
+    }
+    function setStatus(html) { statusEl.innerHTML = html; }
+
+    function updateLensPosition(clientX, clientY) {
+      if (animating) stopOrbit();
+      if (isLocked) return;
+      const rect = canvas.getBoundingClientRect();
+      lens.x = (clientX - rect.left) * (canvas.width / rect.width);
+      lens.y = (clientY - rect.top) * (canvas.height / rect.height);
+      scheduleDraw();
+    }
+
+    function setLocked(locked) {
+      isLocked = locked;
+      setStatus(defaultHint());
+      canvas.style.cursor = locked ? "crosshair" : "grab";
+      scheduleDraw();
+    }
+
+    canvas.addEventListener("mousemove", e => updateLensPosition(e.clientX, e.clientY));
+    canvas.addEventListener("mousedown", () => { if (!isLocked) canvas.style.cursor = "grabbing"; });
+    canvas.addEventListener("mouseup",   () => { if (!isLocked) canvas.style.cursor = "grab"; });
+    canvas.addEventListener("mouseleave",() => { if (!isLocked) canvas.style.cursor = "grab"; });
+
+    // Scroll wheel over the canvas adjusts the Einstein radius
+    canvas.addEventListener("wheel", e => {
+      if (!imageLoaded) return;
+      e.preventDefault();
+      setRadius(einsteinR - Math.sign(e.deltaY) * 6);
+    }, { passive: false });
+
+    // Touch: one finger moves, pinch changes mass, quick two-finger tap locks
+    let pinch = null;
+    let pinched = false;
+    let twoFingerTapStart = 0;
+
+    function touchDist(touches) {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    canvas.addEventListener("touchstart", e => {
+      lastTouchTime = Date.now();
+      if (animating) stopOrbit();
+      if (e.touches.length === 2) {
+        twoFingerTapStart = Date.now();
+        pinched = false;
+        pinch = { startDist: touchDist(e.touches), startR: einsteinR };
+      } else if (e.touches.length === 1) {
+        updateLensPosition(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    });
+
+    canvas.addEventListener("touchmove", e => {
+      e.preventDefault();
+      if (e.touches.length === 2 && pinch) {
+        const d = touchDist(e.touches);
+        if (Math.abs(d - pinch.startDist) > 8) pinched = true;
+        if (pinched && pinch.startDist > 0) setRadius(pinch.startR * d / pinch.startDist);
+      } else if (e.touches.length === 1) {
+        updateLensPosition(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: false });
+
+    canvas.addEventListener("touchend", e => {
+      if (e.touches.length < 2 && pinch) {
+        if (!pinched && Date.now() - twoFingerTapStart < 400) setLocked(!isLocked);
+        pinch = null;
+      }
+    });
+
+    canvas.addEventListener("click", () => {
+      if (Date.now() - lastTouchTime < 500) return;
+      if (animating) { stopOrbit(); return; }
+      setLocked(!isLocked);
+    });
+
+    document.addEventListener("keydown", e => {
+      if (!infoModal.hidden) {
+        if (e.key === "Escape" || e.key.toLowerCase() === "i") infoModal.hidden = true;
+        return;
+      }
+      if (!imageLoaded) return;
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLButtonElement) return;
+      const NUDGE = 5;
+      switch (e.key) {
+        case " ":
+          e.preventDefault();
+          stopOrbit();
+          setLocked(!isLocked);
+          break;
+        case "ArrowLeft":  lens.x = Math.max(0, lens.x - NUDGE); scheduleDraw(); break;
+        case "ArrowRight": lens.x = Math.min(canvas.width,  lens.x + NUDGE); scheduleDraw(); break;
+        case "ArrowUp":    lens.y = Math.max(0, lens.y - NUDGE); scheduleDraw(); break;
+        case "ArrowDown":  lens.y = Math.min(canvas.height, lens.y + NUDGE); scheduleDraw(); break;
+        case "+": case "=": setRadius(einsteinR + 6); break;
+        case "-": case "_": setRadius(einsteinR - 6); break;
+        case "a": case "A": animating ? stopOrbit() : startOrbit(); break;
+        case "r": case "R": resetAll(); break;
+        case "h": case "H": toggleControls(); break;
+        case "i": case "I": infoModal.hidden = false; break;
+        case "Escape": stopOrbit(); break;
+      }
+    });
+
+    function scheduleDraw() {
+      if (!imageLoaded || animating || rafId !== null) return;
+      rafId = requestAnimationFrame(() => { rafId = null; draw(); });
+    }
+
+    img.onload = () => {
+      setStatus("Image loaded, processing&hellip;");
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      sourceImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      outputImageData = ctx.createImageData(canvas.width, canvas.height);
+      imageLoaded = true;
+      canvas.style.cursor = "grab";
+      setStatus(defaultHint());
+      syncUI();
+      draw();
+    };
+
+    img.onerror = () => {
+      setStatus("Image failed to load.");
+    };
+
+    function draw() {
+      if (!imageLoaded || !sourceImageData) return;
+
+      const data = sourceImageData.data;
+      const odata = outputImageData.data;
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Hoist loop-invariant values outside the pixel loop
+      const angleRad = posAngle * Math.PI / 180;
+      const cosA = Math.cos(angleRad);
+      const sinA = Math.sin(angleRad);
+      const q = 1 - ellipticity;
+      const useElliptical = ellipticity >= 0.01;
+
+      // In cluster mode, deflection is the vector sum of each member galaxy's own SIS/SIE
+      // deflection, each computed in that member's own rotated (position-angle) frame and
+      // then rotated back before summing in the shared image-plane frame.
+      let members = null;
+      if (clusterMode) {
+        const scale = einsteinR / CLUSTER_REF_R;
+        members = CLUSTER_MEMBERS.map(m => {
+          const pa = m.pa * Math.PI / 180;
+          return {
+            x: lens.x + m.dx * scale,
+            y: lens.y + m.dy * scale,
+            r: m.r * scale,
+            q: 1 - m.e,
+            cosA: Math.cos(pa),
+            sinA: Math.sin(pa),
+          };
+        });
+      }
+
+      for (let py = 0; py < h; py++) {
+        for (let px = 0; px < w; px++) {
+          const di = (py * w + px) * 4;
+          let sx, sy;
+
+          if (clusterMode) {
+            let alphaX = 0, alphaY = 0, atCenter = false;
+            for (let k = 0; k < members.length; k++) {
+              const m = members[k];
+              const dx = px - m.x, dy = py - m.y;
+              const dxr =  dx * m.cosA + dy * m.sinA;
+              const dyr = -dx * m.sinA + dy * m.cosA;
+              const rr = Math.sqrt(dxr * dxr + dyr * dyr);
+              if (rr < 0.1) { atCenter = true; break; }
+              const alpha = m.r / rr;
+              const axr = alpha * dxr;
+              const ayr = alpha * dyr * m.q;
+              alphaX += axr * m.cosA - ayr * m.sinA;
+              alphaY += axr * m.sinA + ayr * m.cosA;
+            }
+            if (atCenter) {
+              odata[di]   = data[di];
+              odata[di+1] = data[di+1];
+              odata[di+2] = data[di+2];
+              odata[di+3] = 255;
+              continue;
+            }
+            sx = px - alphaX;
+            sy = py - alphaY;
+          } else {
+            const dx = px - lens.x;
+            const dy = py - lens.y;
+            const r = Math.sqrt(dx * dx + dy * dy);
+
+            if (r < 0.1) {
+              odata[di]   = data[di];
+              odata[di+1] = data[di+1];
+              odata[di+2] = data[di+2];
+              odata[di+3] = 255;
+              continue;
+            }
+
+            if (!useElliptical) {
+              const alpha = einsteinR / r;
+              sx = px - alpha * dx;
+              sy = py - alpha * dy;
+            } else {
+              const dxr =  dx * cosA + dy * sinA;
+              const dyr = -dx * sinA + dy * cosA;
+              const rr = Math.sqrt(dxr * dxr + dyr * dyr);
+              const alpha = einsteinR / rr;
+              const axr = alpha * dxr;
+              const ayr = alpha * dyr * q;
+              sx = px - (axr * cosA - ayr * sinA);
+              sy = py - (axr * sinA + ayr * cosA);
+            }
+          }
+
+          if (sx < 0 || sx >= w - 1 || sy < 0 || sy >= h - 1) {
+            odata[di] = odata[di+1] = odata[di+2] = 0;
+            odata[di+3] = 255;
+            continue;
+          }
+
+          const x0 = sx | 0, x1 = x0 + 1;
+          const y0 = sy | 0, y1 = y0 + 1;
+          const fx = sx - x0, fy = sy - y0;
+          const i00 = (y0 * w + x0) * 4;
+          const i10 = (y0 * w + x1) * 4;
+          const i01 = (y1 * w + x0) * 4;
+          const i11 = (y1 * w + x1) * 4;
+
+          for (let c = 0; c < 3; c++) {
+            const v0 = data[i00+c] + (data[i10+c] - data[i00+c]) * fx;
+            const v1 = data[i01+c] + (data[i11+c] - data[i01+c]) * fx;
+            odata[di+c] = v0 + (v1 - v0) * fy;
+          }
+          odata[di+3] = 255;
+        }
+      }
+
+      ctx.putImageData(outputImageData, 0, 0);
+
+      // Lens indicator
+      if (showLens) {
+        const drawGlow = (x, y, r, q2, pa, locked) => {
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(pa);
+          ctx.scale(1, q2);
+
+          const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+          grad.addColorStop(0,    'rgba(255, 240, 200, 1)');
+          grad.addColorStop(0.15, 'rgba(255, 200, 120, 1)');
+          grad.addColorStop(0.35, 'rgba(200, 150, 100, 1)');
+          grad.addColorStop(0.6,  'rgba(100,  80,  60, 1)');
+          grad.addColorStop(0.85, 'rgba( 40,  30,  20, 0.5)');
+          grad.addColorStop(1,    'rgba(  0,   0,   0, 0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(0, 0, r, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = locked ? 'rgba(100, 255, 100, 0.4)' : 'rgba(255, 100, 100, 0.3)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(0, 0, r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        };
+
+        if (clusterMode) {
+          members.forEach(m => drawGlow(m.x, m.y, m.r, m.q, Math.atan2(m.sinA, m.cosA), isLocked));
+        } else {
+          drawGlow(lens.x, lens.y, einsteinR, q, angleRad, isLocked);
+        }
+      }
+
+      if (isLocked) {
+        ctx.strokeStyle = 'rgba(100, 255, 100, 0.6)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(lens.x - 10, lens.y);
+        ctx.lineTo(lens.x + 10, lens.y);
+        ctx.moveTo(lens.x, lens.y - 10);
+        ctx.lineTo(lens.x, lens.y + 10);
+        ctx.stroke();
+      }
+
+      // Unlensed source preview
+      if (showPreview) {
+        const previewSize = 150, previewX = 10, previewY = 10, sourceSize = 100;
+        const psx = Math.max(0, Math.floor(lens.x - sourceSize / 2));
+        const psy = Math.max(0, Math.floor(lens.y - sourceSize / 2));
+        const psw = Math.min(sourceSize, w - psx);
+        const psh = Math.min(sourceSize, h - psy);
+
+        if (psw > 0 && psh > 0) {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+          ctx.fillRect(previewX - 2, previewY - 2, previewSize + 4, previewSize + 4);
+
+          tempCanvas.width = psw;
+          tempCanvas.height = psh;
+          const regionData = tempCtx.createImageData(psw, psh);
+          for (let ry = 0; ry < psh; ry++) {
+            for (let rx = 0; rx < psw; rx++) {
+              const si  = ((psy + ry) * w + (psx + rx)) * 4;
+              const di2 = (ry * psw + rx) * 4;
+              regionData.data[di2]   = data[si];
+              regionData.data[di2+1] = data[si+1];
+              regionData.data[di2+2] = data[si+2];
+              regionData.data[di2+3] = data[si+3];
+            }
+          }
+          tempCtx.putImageData(regionData, 0, 0);
+          ctx.drawImage(tempCanvas, 0, 0, psw, psh, previewX, previewY, previewSize, previewSize);
+
+          if (ellipticity > 0.01) {
+            const causticScale = einsteinR * (previewSize / sourceSize);
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(previewX, previewY, previewSize, previewSize);
+            ctx.clip();
+            ctx.translate(previewX + previewSize / 2, previewY + previewSize / 2);
+            ctx.rotate(angleRad);
+            ctx.strokeStyle = 'rgba(255, 255, 0, 0.8)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            const a = causticScale * ellipticity;
+            for (let i = 0; i <= 100; i++) {
+              const t = (i / 100) * 2 * Math.PI;
+              const ct = Math.cos(t), st = Math.sin(t);
+              const cpx = a * ct * ct * ct;
+              const cpy = a * q * st * st * st;
+              i === 0 ? ctx.moveTo(cpx, cpy) : ctx.lineTo(cpx, cpy);
+            }
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(previewX, previewY, previewSize, previewSize);
+
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.font = '12px Arial';
+          ctx.fillText('Unlensed Source', previewX + 5, previewY + previewSize + 15);
+
+          const crossX = previewX + previewSize / 2;
+          const crossY = previewY + previewSize / 2;
+          ctx.strokeStyle = 'rgba(255, 100, 100, 0.6)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(crossX - 8, crossY);
+          ctx.lineTo(crossX + 8, crossY);
+          ctx.moveTo(crossX, crossY - 8);
+          ctx.lineTo(crossX, crossY + 8);
+          ctx.stroke();
+        }
+      }
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.font = '11px Arial';
+      ctx.textAlign = 'right';
+      ctx.fillText('NASA, ESA, S. Beckwith (STScI) and the HUDF Team', w - 10, h - 10);
+      ctx.textAlign = 'left';
+    }
+
+    document.getElementById('embedBtn').addEventListener('click', function() {
+      const embedCode = `<iframe src="${window.location.href}" width="850" height="1000" frameborder="0" style="border: 1px solid #555;"></iframe>`;
+      navigator.clipboard.writeText(embedCode).then(() => {
+        this.textContent = '✓ Copied!';
+        this.classList.add('copied');
+        setTimeout(() => {
+          this.innerHTML = '&#128203; Embed';
+          this.classList.remove('copied');
+        }, 2000);
+      }).catch(() => alert('Failed to copy. Embed code:\n\n' + embedCode));
+    });
+
+    syncUI();
+  </script>
+</body>
+</html>
+
+
+
+<!--
+Congratulations on finding the hidden ASCII art!
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠛⠛⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠉⠉⠛⠛⠿⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠛⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠛⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠋⠁⠀⠀⠀⠠⣄⣠⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠻⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠉⠀⠀⠀⠀⠀⠀⠐⠢⡿⠿⠷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⣤⣶⣶⣶⣶⣶⣶⣦⣤⣤⣤⣄⣀⣀⣀⣀⣀⣤⣤⣤⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣴⣿⣿⣿⣿⣿⠁⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⣿⣿⣿⠃⣽⣴⡏⠘⡟⠈⣿⣿⣿⣿⠋⢠⣤⠈⡇⠘⣿⡇⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⣿⣿⣿⣿⠂⣿⣿⠁⡀⠃⠀⣿⣿⣿⣟⠀⣿⣿⡇⠀⢠⠙⠃⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⠏⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⣿⣿⣿⣿⣄⣽⡏⢸⣇⣸⡇⢸⣿⣿⣿⣦⣈⣉⣴⣇⣸⣷⣄⣸⣿⣿⣿⣿⣿⢿⣿⣿⣿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢻⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⡿⠁⠀⠀⢀⣀⣠⣿⣧⣤⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⣿⣿⡉⠛⠻⠛⡁⣸⠟⡿⠛⠛⣻⣿⣿⡟⢻⡟⣿⡿⠛⠿⣿⠟⠛⢿⠻⣿⠟⣿⡧⢸⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⡟⠀⠀⠀⠀⠈⢛⣿⣿⣿⡏⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢽⣿⣿⣿⣿⠀⣾⠁⢿⠂⡇⠘⠛⣿⣿⡿⢀⠘⠀⢻⢠⣷⡄⠁⣾⣧⠀⠀⠻⠀⣿⡇⣸⣿⣿⣿⣿⡄⠀⠀⠀⠀⠀⢢⣤⣀⣠⠄⠀⠀⠀⠀⠀⠘⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⡟⠀⠀⠀⠀⠀⠀⠾⠛⠁⠀⠙⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⣿⠂⣿⠀⣤⡀⠇⠸⠿⢿⣿⡇⢸⡀⣤⠸⡈⠻⢁⣄⠛⠃⣴⢘⣆⠀⣿⡟⠛⣿⣿⣿⡿⠁⠀⠀⠀⠀⢀⣤⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠈⢿⣿⣿⣿⣿
+⣿⣿⣿⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣿⣿⣿⣧⣾⣦⣿⣷⣷⣶⣶⣿⣿⣷⣾⣿⣿⣶⣿⣶⣿⣿⣶⣿⣿⣾⣿⣷⣿⣷⣾⣿⣿⡿⠁⠀⠀⠀⠀⠀⠉⢁⣿⠋⠉⠉⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⣿
+⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣀⢠⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠈⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⣿⣿
+⣿⣿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣻⣿⣷⣤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠛⠻⠿⠟⠛⠛⠛⠛⠛⠿⠟⢋⣭⣴⣶⣤⣌⠹⢿⡿⢿⠿⠿⠛⠛⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿
+⣿⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠤⠾⢿⣿⠏⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⢾⣿⣿⣿⣿⠟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣿
+⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠛⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⣬⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⣄⣠⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿
+⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡀⣀⠀⠀⠀⠀⠀⠀⠈⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣿⣿⣷⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿
+⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⣶⡶⠟⠛⢛⡛⠿⣛⡿⠿⣦⣄⣀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠀⢿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⠿⣿⣿⣵⣾⣿⣿⣶⣿⣷⣶⣯⣵⣶⣿⣭⣿⣿⣿⣦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘
+⠀⠀⠀⠀⠀⡀⠤⠀⠀⠀⢠⣴⣤⣤⣀⠀⠀⢀⣀⡀⠀⠀⠀⠀⠀⠀⢀⡞⢡⣾⠿⠿⠋⠁⡀⠈⠙⠻⣿⣿⠿⠛⠛⠛⠛⠻⠿⣿⣿⣿⣆⠀⢀⣀⣀⣀⠀⠀⢀⣠⣤⣤⣤⣤⣤⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀
+⣀⣀⣀⣴⡾⠿⠿⠛⠛⠘⢛⣛⣛⣭⣿⣷⣿⣿⣿⣿⣿⣾⣿⣿⡿⠀⣾⢠⡞⠁⠀⠀⣤⣄⣀⣤⠤⣀⠀⠴⢶⣿⣿⣿⣿⣷⣶⣀⠙⢿⣿⡆⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣶⣶⣤⡾⠷⠄⠀⠠⣀⠄⣴⣿⣿⣤⣶⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣷⣶⣶⣾⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⢸⠁⣸⡇⠀⠀⢸⣿⣿⣁⣰⣶⣿⣿⣶⣾⣿⣿⣿⣿⣿⣿⣷⡁⠈⣿⡇⠀⣿⣿⣿⣿⣿⣿⠿⠿⠿⠏⢉⣉⡉⠉⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣻⣿⣿⣿⡿⠿⣛⣛⣭⣭⣭⣭⣭⣭⣍⠙⢻⣿⣿⣿⣿⣿⠀⣾⠁⣹⠁⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣟⠉⠀⠈⢉⣿⣿⣆⠸⡟⠀⣿⣿⣿⣤⣤⣤⣆⣼⣶⣶⣶⣦⣿⣿⣿⣿⣿⣿⣿⣿⣧⣭⣽⣿⣏⣽⣿⣷⣶⣿⣿⣇⠙⢻⣿⣿⣿
+⣿⣿⣿⣿⠯⠖⠛⠋⠩⢐⣂⣶⣶⣾⣿⣿⣿⣷⣾⣿⣿⣿⣿⣿⠀⢹⣀⡏⡀⠀⠀⢹⣿⣿⣿⡏⠙⣿⣿⣿⣿⣿⣿⣷⣶⣶⡟⠛⣿⡟⢠⠇⢸⣿⣿⣿⣿⣿⣿⣿⡿⠟⠛⠋⢉⣉⣁⣀⣠⣤⣤⣤⣤⣭⣭⣭⣍⣛⣛⣛⣛⡿⠿⢿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣧⣀⣀⣀⣒⣒⣛⣛⣫⣭⣷⣿⣿⡿⢟⣣⣿⣿⣿⣿⣿⣇⠘⣿⠄⣷⡀⠀⠀⠻⣿⣿⣿⡘⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⣰⠟⢁⠎⢠⣿⣿⣿⣿⣿⣿⡏⠡⠀⣠⣴⣿⠋⠉⠁⠀⠀⠀⠀⠀⠈⠉⠉⠉⠉⠉⣉⣛⣛⠻⣿⣶⣬⣍⠛⣿⣿⣿
+⣿⣿⣿⣧⣬⠉⣉⣉⠈⣛⡉⠉⣉⣡⣬⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣆⠘⢧⡈⠃⠀⠀⠀⠙⠻⣿⣧⣘⠻⠿⠿⠿⠿⠿⠛⢉⣠⣤⠖⢁⣴⣿⣿⣿⣷⣶⣶⣶⣶⣶⣶⣿⡿⠿⢿⣶⣦⣤⣤⣀⣀⣀⣀⣀⣀⣀⣀⣀⣈⣛⣿⣿⣿⣿⣿⣿⣶⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣀⠙⠤⠀⠀⠀⠀⠀⠈⠙⠛⠛⠻⠷⠚⠀⢰⣾⠿⠋⣁⣴⣿⣿⣿⣿⣿⣿⣿⣿⣛⣻⡟⢻⣿⣿⣦⣒⣀⣂⣛⠋⠿⠿⠿⢿⣿⣿⡿⢿⠿⢿⣿⣿⣿⡿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⠿⠟⡛⠛⠛⠻⢿⣿⡿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⣄⣁⠒⠐⠲⠶⠿⠿⠛⠓⠀⠀⠀⠀⣤⣶⣿⡟⢡⡤⢸⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⣼⣿⣿⣧⣽⣾⣿⣙⣶⣶⣶⡞⣉⣬⣤⣖⢲⣶⣆⣸⣿⣧⣴⣿⣿⣿⣿
+⣿⣿⡟⠡⣶⡁⠀⠀⣐⣛⣶⣾⠿⢇⣘⠏⣽⣿⡿⠛⠋⠭⠥⠤⢄⣹⣿⣿⣿⣿⣿⣿⣿⠃⣀⡐⠲⣶⣾⠿⠆⠀⣤⠀⠈⡉⠉⠁⣌⠑⣶⣦⡈⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣷⣤⣈⣿⡛⣛⣛⡿⢤⣼⣧⣸⣿⣾⣿⣿⣅⣀⣀⣀⣘⣓⣮⢭⣿⠃⣼⣿⣿⣿⠿⢂⣨⣿⣦⢀⣶⠀⠀⢘⣿⣷⣄⠈⠀⠀⣬⣄⠹⠿⠇⣼⣿⣿⣿⣿⣿⣿⣿⡿⢿⣿⣿⠟⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠛⣛⡛⠿⠿⠿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣶⣾⣿⣿⣾⣿⣿⣿⣿⣿⣿⣷⣼⣿⣿⣧⣿⣿⣿⣶⣿⣿⣿⣿⣿⡇⠐⣿⣿⣿⠉⣤⠀⠀⠀⣾⣿⣿⣿⣷⠀⠀⡈⢻⣿⣶⠾⣿⣿⠋⣻⣿⣿⠛⠛⣧⣴⣿⣿⣧⣄⣘⡿⢿⣧⣬⣿⣧⣤⣾⣿⣿⣷⣶⣷⣾⣿⣦⣤⣶⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⠛⠛⠛⢻⣿⣁⣤⣿⣶⣤⣾⣷⣾⣿⡿⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⣌⣉⣉⡼⠁⠀⠀⠰⣿⣿⣿⣿⣿⣷⠀⢠⠀⣿⣿⣶⣦⣬⣷⣠⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣿⢿⣿⢿⡿⠟⠋⢉⠉⠉⠉⠉⠉⠙⢋⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣷⣀⣠⣾⣿⣿⠯⢏⠹⢟⣃⡘⠛⡥⠤⠤⠭⢭⣅⡘⠻⣯⣹⣿⣿⣿⣿⣿⣿⣿⡟⠡⠀⠀⠀⡀⢿⣿⣿⣿⣿⣿⠀⠰⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣾⣿⢟⣭⣭⣭⣭⣭⣭⣈⣿⣚⣡⣶⣷⣤⣤⣄⣀⣀⣙⣛⣾⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⠛⣡⣶⠿⠛⠉⠁⠀⠀⠀⣀⣠⣤⣴⣦⣬⣿⠆⣹⣿⣦⣿⣿⣿⣿⣿⣿⣿⡷⢃⣈⣤⡡⠄⠻⢿⣿⡟⣿⣷⠁⣼⣿⣿⣿⣿⣿⣿⡿⠿⠿⠿⠿⣿⣿⣷⣦⣌⣽⣿⣿⣿⣿⣿⣿⣿⣍⣴⣷⣾⡿⢦⣛⠁⢩⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣮⣻⣿⣄⣀⣀⣀⣀⣘⣒⣛⣻⣭⢛⣋⡭⠴⣚⣥⣾⣿⣿⣿⣿⣿⣿⣿⣿⣤⣭⣭⣵⣶⣿⡷⢀⣿⣇⠘⠛⠂⠩⢍⣉⡉⠛⢿⣷⣶⣤⣬⣥⣤⣤⣿⡿⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⣛⣿⣛⣛⣉⡉⣭⣭⣤⠰⣶⡞⢻⣿⣿⣿⣿⣛⢉⣉⠙⠋⠿⠟⢛⣩⣭⡥⠈⠁⠐⠚⠛⠛⠛⠛⡉⠠⠀⠩⠔⠂⣈⡿⠛⠿⣿⡟⣋⣁⣐⣲⣶⣀⣈⣭⣡⣤⣶⣤⣬⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣻⣼⣿⣿⣷⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣿⣿⣿⣩⣭⣵⣶⣶⣦⣴⣤⣤⣴⣴⣶⣶⣿⣟⣋⣭⣴⣶⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣾⣿⠛⢛⠛⠋⠙⠛⣛⠛⢻⣿⣿⣿⣿⣿⣿⠟⢻⣿⣿⠿⠿⠻⠿⠿⠿⣿⣻⣿⣿⣿⣿⣿⣿⡁⠀⠀⠀⠰⠤⢻⡿⠋⣽⣿⣿⣿⣿⣉⣀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⣹⣿⣭⣀⡀⠒⢒⣂⣀⣤⠿⠋⠽⢛⡉⠙⠃⡤⠒⠀⠀⠀⠀⠀⠈⢉⣲⣤⣀⠌⣭⣹⣿⣿⣿⣿⣷⣤⣤⣍⣭⣭⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣏⣹⣷⣶⣶⣶⣦⣶⣾⣷⠈⠅⠂⠀⠀⠘⢠⣤⣀⠀⠘⣿⠿⢿⣿⣿⠿⠇⠸⣿⣩⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠟⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣾⣿⡟⢿⣿⣿⣿⣻⡷⢶⣧⣆⣐⣂⡀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠉⠀⠀⢀⣠⠼⢋⣽⣿⣿⣿⠛⠻⠝⣫⣵⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⣿⣿⣷⣾⣷⣾⣿⣿⣷⣾⣷⣶⣶⣶⢿⣦⣬⣤⣍⣬⣭⡤⣶⣾⣿⣿⣿⣿⣏⣴⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣴⣿⣿⣿⣿⣿⣿⣳⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ © Peanuts Worldwide LLC
+-->
