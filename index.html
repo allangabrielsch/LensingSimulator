@@ -608,7 +608,7 @@
                             <label class="check"><input type="checkbox" id="lab-crit" checked> Critical curves</label>
                             <label class="check"><input type="checkbox" id="lab-caus" checked> Caustics</label>
                             <label class="check"><input type="checkbox" id="lab-marks" checked> Image labels</label>
-                            <label class="check"><input type="checkbox" id="lab-light"> Lens light</label>
+                            <label class="check"><input type="checkbox" id="lab-light" checked> Lens light</label>
                         </div>
                     </fieldset>
                 </div>
@@ -2012,7 +2012,7 @@ const LAB = {
     FOV: 5, SFOV: 2.4, N: 640,   // the source plane is shown zoomed in, as in most lensing papers
     model: 'sie', q: 0.75, pa: 20, core: 0, g: 0, gphi: 90, sub: false, subPos: null,
     src: 'galaxy', size: 0.4, sx: 0.09, sy: 0.05,
-    show: { crit: true, caus: true, marks: true, light: false },
+    show: { crit: true, caus: true, marks: true, light: true },
     finder: null, curves: null, cuts: [], images: [],
 };
 let labR = null;
@@ -2316,7 +2316,7 @@ function labPlaceSubhalo() {
 
 function labApply(cfg) {
     Object.assign(LAB, { q: 0.75, pa: 20, core: 0, g: 0, gphi: 90, sub: false, size: 0.4 }, cfg.state || {});
-    LAB.show = Object.assign({ crit: true, caus: true, marks: true, light: false }, cfg.show || {});
+    LAB.show = Object.assign({ crit: true, caus: true, marks: true, light: true }, cfg.show || {});
     for (const k of ['size', 'q', 'pa', 'core', 'g', 'gphi']) labSliders[k].set(LAB[k]);
     $('lab-gphi-row').classList.toggle('off', LAB.g === 0);
     for (const k of Object.keys(LAB.show)) $('lab-' + k).checked = LAB.show[k];
