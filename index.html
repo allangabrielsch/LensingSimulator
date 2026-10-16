@@ -583,7 +583,7 @@
             <div class="lab">
                 <div>
                     <div class="well"><div class="stack"><canvas id="lab-src" class="top" width="640" height="640" tabindex="0" role="img" aria-label="Source plane: the unlensed source and the caustics. Drag to move the source."></canvas></div></div>
-                    <div class="cap"><span><b>Source plane</b> (what is really there)</span><span>yellow: caustics</span></div>
+                    <div class="cap"><span><b>Source plane</b> (what is really there, zoomed in)</span><span>yellow: caustics</span></div>
                 </div>
                 <div>
                     <div class="well"><div class="stack"><canvas id="lab-gl" width="640" height="640" aria-hidden="true"></canvas><canvas id="lab-ov" class="top" width="640" height="640" tabindex="0" role="img" aria-label="Image plane: the lensed images of the source. Drag to move the source."></canvas></div></div>
@@ -2009,7 +2009,7 @@ function dfApply(cfg) {
    lens lab
    ===================================================================== */
 const LAB = {
-    FOV: 5, N: 640,
+    FOV: 5, SFOV: 2.4, N: 640,   // the source plane is shown zoomed in, as in most lensing papers
     model: 'sie', q: 0.75, pa: 20, core: 0, g: 0, gphi: 90, sub: false, subPos: null,
     src: 'galaxy', size: 0.4, sx: 0.09, sy: 0.05,
     show: { crit: true, caus: true, marks: true, light: false },
@@ -2022,26 +2022,36 @@ const labTex = {};
 function makeSourceTextures() {
     const S = 256;
     const mk = () => { const c = document.createElement('canvas'); c.width = c.height = S; return c; };
-    // a clumpy star-forming galaxy
+    // a two-armed spiral seen at an angle. its handedness flips in mirror-image (negative-parity) images
     {
         const c = mk(), ctx = c.getContext('2d');
         const im = ctx.createImageData(S, S);
-        const knots = [[0.18, 0.08, 0.05, [0.5, 0.75, 1.0], 0.9], [-0.15, -0.12, 0.045, [0.85, 0.6, 1.0], 0.7], [0.05, -0.22, 0.035, [0.45, 0.85, 1.0], 0.6], [-0.22, 0.17, 0.03, [1.0, 0.7, 0.8], 0.5]];
+        let seed = 7;
+        const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };   // reproducible knots
+        const k = 1 / Math.tan(26 * Math.PI / 180);     // pitch angle 26°
+        const knots = [];
+        for (const arm of [0, 1]) for (let j = 0; j < 7; j++) {
+            const r = 0.08 + 0.05 * j + 0.02 * (rnd() - 0.5);
+            const ph = k * Math.log(r / 0.05) + arm * Math.PI + 0.16 * (rnd() - 0.5);
+            const col = rnd() < 0.75 ? [0.75, 0.85, 1.0] : [1.0, 0.6, 0.75];
+            knots.push([r * Math.cos(ph), r * Math.sin(ph), 0.006 + 0.005 * rnd(), col, 0.5 + 0.5 * rnd()]);
+        }
+        const rot = 25 * Math.PI / 180, incl = 0.78, str = v => Math.asinh(4 * v) / Math.asinh(4);
         for (let j = 0; j < S; j++) for (let i = 0; i < S; i++) {
             const x = (i + 0.5) / S - 0.5, y = 0.5 - (j + 0.5) / S;
-            const xr = x * 0.9 + y * 0.44, yr = -x * 0.44 + y * 0.9;
-            const r = Math.hypot(xr, yr / 0.62);
-            const disk = Math.exp(-r / 0.085), bulge = Math.exp(-Math.hypot(x, y) / 0.03);
-            let R = 0.42 * disk + 0.95 * bulge, G = 0.55 * disk + 0.8 * bulge, B = 0.95 * disk + 0.55 * bulge;
-            const arm = Math.max(0, Math.cos(2 * Math.atan2(yr / 0.62, xr) - 9 * r)) * disk * 0.35;
-            R += 0.3 * arm; G += 0.4 * arm; B += 0.6 * arm;
-            for (const [kx, ky, ks, col, a] of knots) {
-                const f = a * Math.exp(-((x - kx) ** 2 + (y - ky) ** 2) / (2 * ks * ks));
+            const xr = x * Math.cos(rot) + y * Math.sin(rot), yr = (-x * Math.sin(rot) + y * Math.cos(rot)) / incl;
+            const r = Math.hypot(xr, yr) + 1e-6, phi = Math.atan2(yr, xr);
+            const arm = (0.5 + 0.5 * Math.cos(2 * (phi - k * Math.log(r / 0.05)))) ** 4;
+            const disk = 1.3 * Math.exp(-r / 0.12) * (0.25 + 1.6 * arm * Math.min(1, r / 0.05));
+            const bulge = 1.2 * Math.exp(-2 * (r / 0.05) ** 0.8);
+            let R = 0.6 * disk + bulge, G = 0.74 * disk + 0.8 * bulge, B = disk + 0.5 * bulge;
+            for (const [kx, ky, ks, col, amp] of knots) {
+                const f = amp * Math.exp(-((xr - kx) ** 2 + (yr - ky) ** 2) / (2 * ks * ks));
                 R += f * col[0]; G += f * col[1]; B += f * col[2];
             }
-            const edge = clamp((0.5 - Math.hypot(x, y)) / 0.05, 0, 1);
-            const k = 4 * (j * S + i);
-            im.data[k] = clamp(R * edge, 0, 1) * 255; im.data[k + 1] = clamp(G * edge, 0, 1) * 255; im.data[k + 2] = clamp(B * edge, 0, 1) * 255; im.data[k + 3] = 255;
+            const edge = clamp((0.5 - Math.hypot(x, y)) / 0.06, 0, 1);
+            const p = 4 * (j * S + i);
+            im.data[p] = 255 * clamp(str(R) * edge, 0, 1); im.data[p + 1] = 255 * clamp(str(G) * edge, 0, 1); im.data[p + 2] = 255 * clamp(str(B) * edge, 0, 1); im.data[p + 3] = 255;
         }
         ctx.putImageData(im, 0, 0);
         labTex.galaxy = c;
@@ -2174,24 +2184,30 @@ function labRender() {
 
     // source plane
     const sc = $('lab-src').getContext('2d');
+    {
+        // own, zoomed scale for the source plane
+        const ks = W / LAB.SFOV;
+        var sx = x => (x + LAB.SFOV / 2) * ks, sy = y => W - (y + LAB.SFOV / 2) * ks, kS = ks;
+    }
     sc.fillStyle = '#000'; sc.fillRect(0, 0, W, W);
     sc.strokeStyle = 'rgba(255,255,255,0.12)'; sc.lineWidth = 1;
-    for (let v = -2; v <= 2; v++) { sc.beginPath(); sc.moveTo(tx(v), 0); sc.lineTo(tx(v), W); sc.moveTo(0, ty(v)); sc.lineTo(W, ty(v)); sc.stroke(); }
-    sc.fillStyle = 'rgba(255,255,255,0.4)'; sc.font = '13px Helvetica, Arial, sans-serif'; sc.textBaseline = 'top';
-    sc.fillText('1 θE', tx(1) + 3, ty(0) + 3);
+    for (let v = -1; v <= 1; v += 0.5) { sc.beginPath(); sc.moveTo(sx(v), 0); sc.lineTo(sx(v), W); sc.moveTo(0, sy(v)); sc.lineTo(W, sy(v)); sc.stroke(); }
+    sc.fillStyle = 'rgba(255,255,255,0.45)'; sc.font = '14px Helvetica, Arial, sans-serif'; sc.textBaseline = 'top';
+    sc.fillText('0.5 θE', sx(0.5) + 4, sy(0) + 4);
+    sc.textAlign = 'right'; sc.fillText(`zoomed: ${LAB.SFOV} θE across`, W - 8, 8); sc.textAlign = 'left';
     sc.imageSmoothingEnabled = true;
-    sc.drawImage(labTex[LAB.src], tx(LAB.sx - size / 2), ty(LAB.sy + size / 2), size * k, size * k);
+    sc.drawImage(labTex[LAB.src], sx(LAB.sx - size / 2), sy(LAB.sy + size / 2), size * kS, size * kS);
     if (LAB.show.caus) {
-        sc.strokeStyle = 'rgba(255, 220, 60, 0.95)'; sc.lineWidth = 2; strokeSegs(sc, LAB.curves.caus, tx, ty);
+        sc.strokeStyle = 'rgba(255, 220, 60, 0.95)'; sc.lineWidth = 2; strokeSegs(sc, LAB.curves.caus, sx, sy);
         sc.setLineDash([6, 5]); sc.strokeStyle = 'rgba(255, 150, 60, 0.9)'; sc.lineWidth = 1.6;
-        for (const cut of LAB.cuts) { sc.beginPath(); for (let i = 0; i < cut.length; i += 2) sc[i ? 'lineTo' : 'moveTo'](tx(cut[i]), ty(cut[i + 1])); sc.stroke(); }
+        for (const cut of LAB.cuts) { sc.beginPath(); for (let i = 0; i < cut.length; i += 2) sc[i ? 'lineTo' : 'moveTo'](sx(cut[i]), sy(cut[i + 1])); sc.stroke(); }
         sc.setLineDash([]);
     }
     sc.strokeStyle = 'rgba(255, 110, 110, 0.9)'; sc.lineWidth = 1.5;
-    const X = tx(LAB.sx), Y = ty(LAB.sy);
+    const X = sx(LAB.sx), Y = sy(LAB.sy);
     sc.beginPath(); sc.moveTo(X - 7, Y); sc.lineTo(X + 7, Y); sc.moveTo(X, Y - 7); sc.lineTo(X, Y + 7); sc.stroke();
     sc.fillStyle = 'rgba(255,255,255,0.75)';
-    sc.beginPath(); sc.arc(tx(0), ty(0), 3, 0, 2 * Math.PI); sc.fill();
+    sc.beginPath(); sc.arc(sx(0), sy(0), 3, 0, 2 * Math.PI); sc.fill();
 }
 
 function labTable() {
@@ -2260,8 +2276,9 @@ function labInit() {
         const cv = $(id);
         const set = e => {
             const r = cv.getBoundingClientRect();
-            LAB.sx = clamp(((e.clientX - r.left) / r.width - 0.5) * LAB.FOV, -2.4, 2.4);
-            LAB.sy = clamp((0.5 - (e.clientY - r.top) / r.height) * LAB.FOV, -2.4, 2.4);
+            const fov = id === 'lab-src' ? LAB.SFOV : LAB.FOV;
+            LAB.sx = clamp(((e.clientX - r.left) / r.width - 0.5) * fov, -2.4, 2.4);
+            LAB.sy = clamp((0.5 - (e.clientY - r.top) / r.height) * fov, -2.4, 2.4);
             labSourceMoved();
         };
         let drag = false;
@@ -2879,7 +2896,7 @@ const EXPERIMENTS = [
     { t: 'Build an Einstein cross', p: 'Flatten the lens and put a quasar inside the diamond-shaped caustic.', show: () => { labApply({ model: 'sie', src: 'quasar', state: { q: 0.7, pa: 30, sx: 0.05, sy: 0.03, size: 0.25 } }); go('lab'); }, a: 'An elliptical lens turns the point-like caustic of a round lens into a diamond (an astroid). A source inside it has four images (plus a fifth, hidden one at the centre if the lens has a core). Two images are minima of the arrival time, and two are saddle points with flipped parity.' },
     { t: 'Watch two images merge on a fold', p: 'Drag the quasar slowly out of the diamond through one of its smooth edges.', show: () => { labApply({ model: 'sie', src: 'quasar', state: { q: 0.7, pa: 0, sx: 0.0, sy: 0.12, size: 0.12 } }); go('lab'); }, a: 'Just inside the caustic, two images sit close together on either side of the red critical curve. They are very bright, with |μ| growing like 1/√(distance to the caustic). They have opposite parity. When the source crosses the fold, they merge and disappear. Image counts always change by two.' },
     { t: 'Find the missing central image', p: 'Give the lens a core and look near the centre of the image plane.', show: () => { labApply({ model: 'sie', src: 'quasar', state: { q: 0.75, pa: 20, core: 0.12, sx: 0.06, sy: 0.04, size: 0.25 } }); go('lab'); }, a: 'A lens with a smooth, finite centre obeys the odd-number theorem. Here a faint fifth image appears near the centre. It is a <b>maximum</b> of the arrival time, so it arrives last, and it is strongly demagnified. In real lenses it is almost always hidden by the lens galaxy\'s light, which is why we "see" 2 and 4 images. Make the core bigger and the radial critical curve (the small inner red loop) grows.' },
-    { t: 'Which images are mirrored?', p: 'Lens a winking smiley and look at which eye winks in each image.', show: () => { labApply({ model: 'sie', src: 'smiley', state: { q: 0.75, pa: 20, sx: 0.06, sy: 0.035, size: 0.15 } }); go('lab'); }, a: 'Images with μ &lt; 0 (orange labels) have <b>negative parity</b>: they are mirror images of the source. Their wink is on the other side. Saddle-point images are always flipped, while minima and maxima are not. Switch to the grid source to see how each part of the source plane is stretched and folded.' },
+    { t: 'Which images are mirrored?', p: 'Lens a winking smiley and look at which eye winks in each image.', show: () => { labApply({ model: 'sie', src: 'smiley', state: { q: 0.75, pa: 20, sx: 0.06, sy: 0.035, size: 0.15 } }); go('lab'); }, a: 'Images with μ &lt; 0 (orange labels) have <b>negative parity</b>: they are mirror images of the source. Their wink is on the other side. Saddle-point images are always flipped, while minima and maxima are not. With the galaxy source, the spiral arms of a mirrored image wind the other way. Switch to the grid source to see how each part of the source plane is stretched and folded.' },
     { t: 'Lensing conserves surface brightness', p: 'Drag the before/after slider to compare the lensed sky with the original.', show: () => { dfApply({ model: 'sie', state: { sig: 1100, q: 0.85 }, lens: { x: 141, y: 47 }, lock: true }); DF.split = 50; dfSyncSliders(); dfDraw(); go('deepfield'); }, a: 'Arcs look impressive, but compare a single pixel in a lensed galaxy with the same galaxy unlensed: it has the same colour and the same brightness per unit area. Lensing changes the <b>size</b> of an image, not its surface brightness. The phase-space density of photons is conserved along each ray (Liouville\'s theorem), and a static lens does not shift their frequency. A magnification of 10 means 10 times the area, and hence 10 times the total flux.' },
     { t: 'A cluster and its dark matter', p: 'Load the cluster, then turn on the magnification map.', show: () => { dfApply({ model: 'cluster', state: { ...CLUSTER_DEF }, show: { crit: true, mag: true }, lens: { x: 90, y: 90 }, lock: true }); go('deepfield'); }, a: 'Blue regions have positive parity, orange ones negative, and the colour gets stronger with magnification. The critical curves run along the boundaries. The smooth halo, which carries most of the mass, gives off no light at all. In real clusters, lensing (together with galaxy velocities and X-ray gas) shows that around 85% of the matter is dark.' },
     { t: 'Move the source closer', p: 'With a lens in place, slide the source redshift down towards the lens redshift.', show: () => { dfApply({ model: 'sie', state: { sig: 1300, zs: 3 }, lens: { x: 92, y: 90 }, show: { crit: true }, lock: true }); go('deepfield'); }, a: 'The lensing strength depends on <i>D</i><sub>ds</sub>/<i>D</i><sub>s</sub>. It grows quickly at first and then saturates: a source at <i>z</i> = 6 is lensed only a little more strongly than one at <i>z</i> = 3. When the source is at or in front of the lens, nothing is lensed. Because each galaxy in a real deep field is at a different redshift, it sees a slightly different Einstein radius. That difference is what lets lensing measure cosmology.' },
