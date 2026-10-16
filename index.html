@@ -288,6 +288,11 @@
 
         .sim { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 330px); gap: 16px; align-items: start; }
         .lab { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+        ol.steps { margin: 0; padding-left: 0; list-style: none; }
+        ol.steps li { display: grid; grid-template-columns: 1.6em minmax(0, 1fr); gap: 4px; margin: 3px 0; color: var(--muted); }
+        ol.steps li.done { color: var(--well-text); }
+        ol.steps li.now { color: var(--well-text); font-weight: 600; }
+        ol.steps li::before { content: attr(data-mark); font-family: var(--mono); }
         .td { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 14px; align-items: start; }
         .ctl-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 0 16px; margin-top: 14px; }
         @media (max-width: 860px) {
@@ -639,7 +644,7 @@
     <section id="cosmo" class="win not-embed" aria-labelledby="td-t">
         <div class="titlebar"><span id="td-t">Time-delay cosmography: measure H₀ yourself</span><span class="path">~/lensing/timedelays</span></div>
         <div class="win-body">
-            <p>A quasar flickers on its own, by a few tenths of a magnitude over weeks to months. Every lensed image shows the same flicker, but each one arrives late by a different amount. The light took paths of different lengths, through different depths of the lens potential. All those delays scale with the time-delay distance <i>D</i><sub>Δt</sub>, and <i>D</i><sub>Δt</sub> ∝ 1/<i>H</i><sub>0</sub>. Below are three seasons of simulated monitoring from a universe with a <b>secret</b> Hubble constant. Slide <b>your</b> <i>H</i><sub>0</sub> until the model curves line up with the data points.</p>
+            <p>A quasar flickers on its own, by a few tenths of a magnitude over weeks to months. Every lensed image shows the same flicker, but each one arrives late by a different amount. The light took paths of different lengths, through different depths of the lens potential. All those delays scale with the time-delay distance <i>D</i><sub>Δt</sub>, and <i>D</i><sub>Δt</sub> ∝ 1/<i>H</i><sub>0</sub>. Below are three seasons of simulated monitoring from a universe with a <b>secret</b> Hubble constant. Your job: find it. The steps below the plots walk you through it.</p>
             <div class="td">
                 <div>
                     <div class="well"><div class="stack"><canvas id="td-gl" width="560" height="560" aria-hidden="true"></canvas><canvas id="td-ov" width="560" height="560" role="img" aria-label="The lensed quasar with contours of the arrival-time surface"></canvas></div></div>
@@ -648,22 +653,28 @@
                 <div>
                     <div class="well"><canvas id="td-lc" width="1000" height="470" style="display:block;width:100%;aspect-ratio:1000/470" role="img" aria-label="Light curves of the images: data points and the delays predicted by your H0"></canvas></div>
                     <div class="cap"><span><b>Light curves</b>: dots = data, lines = your model (brighter is up)</span><span id="td-lc-note"></span></div>
-                    <div class="well" style="margin-top:10px"><canvas id="td-chi" width="1000" height="250" style="display:block;width:100%;aspect-ratio:1000/250" role="img" aria-label="Goodness of fit against H0"></canvas></div>
-                    <div class="cap"><span><b>How well each <i>H</i><sub>0</sub> fits</b> (Δχ², lower is better)</span><span>red: your <i>H</i><sub>0</sub></span></div>
+                    <div class="well" style="margin-top:10px"><canvas id="td-plane" width="1000" height="430" style="display:block;width:100%;aspect-ratio:1000/430;touch-action:none;cursor:crosshair" tabindex="0" role="img" aria-label="Your model in the plane of H0 and the mass-sheet parameter lambda. Drag to move it."></canvas></div>
+                    <div class="cap"><span><b>Your model in the <i>H</i><sub>0</sub>–λ plane</b>: drag the red cross</span><span>blue: light curves · orange: kinematics</span></div>
                 </div>
             </div>
             <div class="ctl-cols">
                 <div>
                     <fieldset>
                         <legend>Your cosmology and lens model</legend>
-                        <label class="ctl"><span><i>H</i><sub>0</sub> <span class="small">km/s/Mpc</span></span><input id="td-h0" type="range" min="40" max="100" step="0.1" value="58"><output id="td-h0-o"></output></label>
-                        <label class="ctl"><span>Mass sheet λ</span><input id="td-lam" type="range" min="0.8" max="1.2" step="0.01" value="1"><output id="td-lam-o"></output></label>
-                        <p class="small" style="margin:4px 0 8px">λ ≠ 1: your lens model differs from the true one by a mass-sheet transformation, κ → λκ + 1 − λ. It reproduces the same images and flux ratios, but the delays it predicts are wrong.</p>
+                        <label class="ctl"><span><i>H</i><sub>0</sub> <span class="small">km/s/Mpc</span></span><input id="td-h0" type="range" min="40" max="100" step="0.1" value="75"><output id="td-h0-o"></output></label>
+                        <label class="ctl"><span>Mass sheet λ</span><input id="td-lam" type="range" min="0.7" max="1.3" step="0.01" value="1"><output id="td-lam-o"></output></label>
+                        <p class="small" style="margin:4px 0 8px">Images and flux ratios only fix the lens up to a mass-sheet transformation, κ → λκ + 1 − λ. Every λ fits them equally well, but the predicted delays scale with λ. λ = 1 is the "naive" model.</p>
                         <div class="row">
-                            <button id="td-fit" class="btn small-btn" type="button">Fit H₀ for me</button>
+                            <button id="td-fit" class="btn small-btn" type="button">Fit for me</button>
                             <button id="td-reveal" class="btn small-btn" type="button">Reveal the true H₀</button>
                             <button id="td-new" class="btn small-btn" type="button">New universe</button>
                         </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Stellar kinematics</legend>
+                        <label class="check"><input type="checkbox" id="td-kin"> Measure the lens galaxy's velocity dispersion</label>
+                        <label class="ctl" style="margin-top:6px"><span>Precision</span><select id="td-kerr" style="width:100%"><option value="0.1">±10% (short exposure)</option><option value="0.05">±5% (8-m telescope)</option><option value="0.02" selected>±2% (JWST)</option></select><output></output></label>
+                        <p class="small" id="td-kin-read" style="margin:4px 0 0"></p>
                     </fieldset>
                     <fieldset>
                         <legend>Show</legend>
@@ -692,7 +703,7 @@
                 </div>
             </div>
             <div class="table-wrap" style="margin-top:12px"><table class="res" id="td-res"></table></div>
-            <div class="tip-box" id="td-tip"></div>
+            <div class="tip-box" id="td-tip" aria-live="polite"></div>
         </div>
         <div class="statusbar"><span id="td-status">Ready.</span><span class="fixed" id="td-fitout"></span></div>
     </section>
@@ -2187,8 +2198,9 @@ function labApply(cfg) {
    ===================================================================== */
 const TD = {
     FOV: 3.2, N: 560,
-    cfg: 'quad', thE: 1.5, zl: 0.5, zs: 2, H0: 58, lam: 1,
-    H0true: 0, seed: 1016, revealed: false, undo: false, all: false, cont: true,
+    cfg: 'quad', thE: 1.5, zl: 0.5, zs: 2, H0: 75, lam: 1,
+    H0true: 0, lamTrue: 1, seed: 19, revealed: false, undo: false, all: false, cont: true,
+    kin: false, kinErr: 0.02, kinG: 0, triedLam: false,
     lens: null, images: [], data: null, intr: null, chi: null, contours: null, offs: [],
 };
 // lookalike configurations, in units of θ_E
@@ -2204,7 +2216,14 @@ const TD_SIG = 0.03;                // photometric noise per point, mag
 const TD_BASE = 18.2;               // unlensed quasar magnitude
 let tdR = null;
 
-const tdRng = seed => { let s = Math.floor(seed) % 2147483647; if (s <= 0) s += 2147483646; return () => (s = s * 16807 % 2147483647) / 2147483647; };
+// Park–Miller, with the seed scrambled and a few draws discarded: nearby seeds otherwise start with
+// nearly identical (and, for small seeds, tiny) first values
+const tdRng = seed => {
+    let s = Math.floor(Math.abs(Math.sin(seed * 12.9898 + 78.233) * 43758.5453) * 1e4) % 2147483646 + 1;
+    const next = () => (s = s * 16807 % 2147483647) / 2147483647;
+    for (let k = 0; k < 8; k++) next();
+    return next;
+};
 const tdGauss = r => { let u = 0; while (u === 0) u = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * r()); };
 function tdIntr(t) {
     const x = clamp(t - TD_T0, 0, TD_T1 - TD_T0 - 1.000001), k = Math.floor(x), f = x - k;
@@ -2257,6 +2276,7 @@ function tdData(mocks = true) {
     TD.data = tdObserve(r);
     // error bars the way monitoring campaigns get them: re-simulate the noise and microlensing
     // with the same delays, refit, and take the scatter of the fits
+    TD.kinG = tdGauss(tdRng(TD.seed * 7 + 3));
     if (!mocks && TD.mockSig) return;
     const fits = [];
     for (let k = 0; k < 16; k++) fits.push(tdBest(tdObserve(tdRng(TD.seed * 31 + 1000 + k))));
@@ -2266,7 +2286,7 @@ function tdData(mocks = true) {
 // one realisation of the observations: delayed intrinsic curve + magnification offset + a slow,
 // independent wobble per image (standing in for microlensing by stars in the lens) + photometric noise
 function tdObserve(r) {
-    const T = tdDays(TD.H0true);
+    const T = tdDays(TD.H0true) * TD.lamTrue;
     return TD.images.map(im => {
         const dt = im.dtau * T, off = TD_BASE - 2.5 * Math.log10(Math.abs(im.mu));
         let ml = 0.08 * tdGauss(r);
@@ -2275,11 +2295,11 @@ function tdObserve(r) {
     });
 }
 
-// χ² of a data set for a given H0. each image gets its own magnitude offset per season, fitted
+// χ² of a data set for a given H0/λ. each image gets its own magnitude offset per season, fitted
 // analytically: that soaks up the slow microlensing drifts, as in real analyses
 function tdChi2(H0, data, wantOffs) {
     data = data || TD.data;
-    const T = tdDays(H0) * TD.lam;
+    const T = tdDays(H0);     // H0 here is the effective H0/λ: delays only know about that combination
     let chi = 0, n = 0;
     const offs = [];
     data.forEach((D, i) => {
@@ -2301,18 +2321,37 @@ function tdBest(data) {
     return best;
 }
 function tdScan(dh = 0.1) {
-    const H = [], X = [], nk = Math.round(60 / dh);
-    for (let k = 0; k <= nk; k++) { const h = 40 + k * dh; H.push(h); X.push(tdChi2(h)); }
+    // the light curves constrain h = H0/λ only; scan it over everything the plane can show
+    const H = [], X = [], nk = Math.round(100 / dh);
+    for (let k = 0; k <= nk; k++) { const h = 30 + k * dh; H.push(h); X.push(tdChi2(h)); }
     let kmin = 0;
     X.forEach((x, k) => { if (x < X[kmin]) kmin = k; });
-    const best = H[kmin], sig = TD.mockSig;
-    const lo = Math.max(40, best - sig), hi = Math.min(100, best + sig);
-    // scale the curve so it reaches 1 at the edges of the 1σ band (when the band is resolvable)
-    const at = h => X[clamp(Math.round((h - 40) / dh), 0, nk)];
-    const scale = Math.max(1e-9, 0.5 * (at(lo) + at(hi)) - X[kmin]);
-    // a flat χ² (no usable delay) means H0 is not constrained at all
     const flat = (Math.max(...X) - X[kmin]) / Math.max(X[kmin], 1) < 0.02;
-    TD.chi = { H, X, best, lo, hi, scale, min: X[kmin], open: flat || hi - lo > 25 };
+    // the delays themselves come out to a fraction of a percent here, but a real lens also carries a
+    // few percent of lens-model and line-of-sight uncertainty: add a 2% floor in quadrature
+    const sig = flat ? 1e3 : Math.hypot(TD.mockSig, 0.02 * H[kmin]);
+    TD.chi = { best: H[kmin], sig, delaySig: TD.mockSig, open: flat || sig > 15 };
+}
+// what the kinematics say. σ_v of the naive (λ = 1) model follows from θ_E; under a mass-sheet
+// transformation the predicted σ_v² scales with λ, while H0 does not enter at all (D_s/D_ds is a ratio)
+function tdKin() {
+    const d = lensDistances(TD.zl, TD.zs);
+    const s1 = C_KMS * Math.sqrt(TD.thE * PHYS.ARCSEC * d.Ds / (4 * Math.PI * Math.max(d.Dds, 1e-9)));
+    const obs = s1 * Math.sqrt(TD.lamTrue) * (1 + TD.kinErr * TD.kinG);
+    return { s1, obs, err: TD.kinErr * obs, lamBest: (obs / s1) ** 2, lamSig: 2 * TD.kinErr * (obs / s1) ** 2 };
+}
+// Gaussian χ² of a point in the (H0, λ) plane
+function tdChiPlane(H0, lam, K) {
+    const C = TD.chi;
+    const cd = ((H0 / lam - C.best) / C.sig) ** 2;
+    const ck = TD.kin ? ((K.s1 * Math.sqrt(lam) - K.obs) / K.err) ** 2 : 0;
+    return { cd, ck };
+}
+// combined answer: along the light-curve band, at the λ the kinematics prefer
+function tdCombined(K) {
+    const C = TD.chi, lam = K.lamBest, H0 = lam * C.best;
+    const rel = Math.sqrt((C.sig / C.best) ** 2 + (K.lamSig / lam) ** 2);
+    return { H0, lam, err: H0 * rel };
 }
 
 // while a slider moves, skip the mock refits (the error bar keeps its last value); redo them once it stops
@@ -2333,9 +2372,9 @@ function tdDraw() {
 }
 
 function tdRender() {
-    const fit = tdChi2(TD.H0, null, true);
+    const fit = tdChi2(TD.H0 / TD.lam, null, true);
     TD.offs = fit.offs;
-    const T = tdDays(TD.H0) * TD.lam;
+    const T = tdDays(TD.H0 / TD.lam);
 
     // ---- the lens
     const o = -TD.FOV / 2, W = TD.N, k = W / TD.FOV, s = 0.16;
@@ -2365,7 +2404,7 @@ function tdRender() {
     ov.fillText(`${(TD.FOV * TD.thE).toFixed(1)}″ across`, 8, W - 10);
 
     tdLightCurves(T);
-    tdChiPlot();
+    tdPlane();
     tdTables(T);
 }
 
@@ -2436,35 +2475,56 @@ function tdLightCurves(T) {
     $('td-lc-note').textContent = TD.undo ? 'right H₀: all images fall on one curve' : (TD.all ? 'three seasons' : 'first season');
 }
 
-function tdChiPlot() {
-    const cv = $('td-chi'), ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
-    const L = 74, Rm = 44, Tp = 14, B = 46;
-    const st = tdAxes(ctx, W, H, L, Rm, Tp, B);
-    const C = TD.chi, ymax = 25;
-    const X = h => L + (h - 40) / 60 * (W - L - Rm);
-    const Y = v => H - B - Math.min(v, ymax) / ymax * (H - Tp - B);
+const TD_PL = { L: 78, R: 18, T: 14, B: 50 };
+function tdPlane() {
+    const cv = $('td-plane'), ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
+    const { L, R, T: Tp, B } = TD_PL;
+    const st = tdAxes(ctx, W, H, L, R, Tp, B);
+    const K = tdKin();
+    const X = h => L + (h - 40) / 60 * (W - L - R), Y = l => H - B - (l - 0.7) / 0.6 * (H - Tp - B);
+    // the two constraints as translucent bands (1σ dark, 2σ light)
+    const bl = [42, 120, 214], or = [235, 104, 52];
+    const cell = 4;
+    for (let py = Tp; py < H - B; py += cell) for (let px = L; px < W - R; px += cell) {
+        const h = 40 + (px + cell / 2 - L) / (W - L - R) * 60, l = 0.7 + (H - B - py - cell / 2) / (H - Tp - B) * 0.6;
+        const { cd, ck } = tdChiPlane(h, l, K);
+        const ad = cd < 1 ? 0.42 : cd < 4 ? 0.18 : 0, ak = TD.kin ? (ck < 1 ? 0.38 : ck < 4 ? 0.16 : 0) : 0;
+        if (!ad && !ak) continue;
+        const a = 1 - (1 - ad) * (1 - ak);
+        const w = ad + ak;
+        ctx.fillStyle = `rgba(${Math.round((bl[0] * ad + or[0] * ak) / w)}, ${Math.round((bl[1] * ad + or[1] * ak) / w)}, ${Math.round((bl[2] * ad + or[2] * ak) / w)}, ${a})`;
+        ctx.fillRect(px, py, cell, cell);
+    }
     ctx.font = '20px Helvetica, Arial, sans-serif'; ctx.fillStyle = st.axis; ctx.strokeStyle = st.grid; ctx.lineWidth = 1;
     ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-    for (const v of [0, 5, 10, 15, 20, 25]) { ctx.beginPath(); ctx.moveTo(L, Y(v)); ctx.lineTo(W - Rm, Y(v)); ctx.stroke(); ctx.fillText(String(v), L - 8, Y(v)); }
+    for (let l = 0.7; l <= 1.3001; l += 0.1) { ctx.beginPath(); ctx.moveTo(L, Y(l)); ctx.lineTo(W - R, Y(l)); ctx.stroke(); ctx.fillText(l.toFixed(1), L - 8, Y(l)); }
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     for (let h = 40; h <= 100; h += 10) { ctx.beginPath(); ctx.moveTo(X(h), Tp); ctx.lineTo(X(h), H - B); ctx.stroke(); ctx.fillText(String(h), X(h), H - B + 6); }
-    ctx.fillStyle = st.fg; ctx.fillText('H₀ [km/s/Mpc]', (L + W - Rm) / 2, H - 22);
+    ctx.fillStyle = st.fg; ctx.fillText('H₀ [km/s/Mpc]', (L + W - R) / 2, H - 25);
+    ctx.save(); ctx.translate(20, (Tp + H - B) / 2); ctx.rotate(-Math.PI / 2); ctx.textBaseline = 'middle'; ctx.fillText('mass sheet λ', 0, 0); ctx.restore();
     st.box();
-    ctx.save(); ctx.beginPath(); ctx.rect(L, Tp, W - L - Rm, H - Tp - B); ctx.clip();
-    // 1σ band
-    ctx.fillStyle = 'rgba(42, 120, 214, 0.15)';
-    ctx.fillRect(X(C.lo), Tp, X(C.hi) - X(C.lo), H - Tp - B);
-    ctx.strokeStyle = cssVar('--s1'); ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    C.H.forEach((h, k) => ctx[k ? 'lineTo' : 'moveTo'](X(h), Y((C.X[k] - C.min) / C.scale)));
-    ctx.stroke();
-    if (TD.revealed) {
-        ctx.setLineDash([7, 6]); ctx.strokeStyle = st.fg; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(X(TD.H0true), Tp); ctx.lineTo(X(TD.H0true), H - B); ctx.stroke(); ctx.setLineDash([]);
-        ctx.fillStyle = st.fg; ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText('true', X(TD.H0true) + 6, Tp + 4);
+    ctx.save(); ctx.beginPath(); ctx.rect(L, Tp, W - L - R, H - Tp - B); ctx.clip();
+    // labels on the bands
+    ctx.font = '600 18px Helvetica, Arial, sans-serif'; ctx.textBaseline = 'middle';
+    if (!TD.chi.open) {
+        const lab = 0.76, hb = TD.chi.best * lab;
+        ctx.fillStyle = 'rgba(30, 90, 170, 0.95)'; ctx.textAlign = 'left';
+        ctx.save(); ctx.translate(X(hb) + 10, Y(lab));
+        ctx.rotate(-Math.atan2(Y(1.1) - Y(lab), X(TD.chi.best * 1.1) - X(hb)) * -1);
+        ctx.fillText('light curves fit here (H₀/λ fixed)', 0, 0); ctx.restore();
     }
-    ctx.strokeStyle = '#d23c3c'; ctx.lineWidth = 2.5;
-    ctx.beginPath(); ctx.moveTo(X(TD.H0), Tp); ctx.lineTo(X(TD.H0), H - B); ctx.stroke();
+    if (TD.kin) { ctx.fillStyle = 'rgba(190, 80, 30, 0.95)'; ctx.textAlign = 'right'; ctx.fillText('velocity dispersion fits here', W - R - 10, Y(K.lamBest) - 4); }
+    // truth
+    if (TD.revealed) {
+        ctx.fillStyle = st.fg; ctx.strokeStyle = cssVar('--well');
+        star(ctx, X(TD.H0true), Y(TD.lamTrue), 12); ctx.fill(); ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.textAlign = 'left'; ctx.font = '600 18px Helvetica, Arial, sans-serif'; ctx.fillText('truth', X(TD.H0true) + 14, Y(TD.lamTrue) + 14);
+    }
+    // you
+    const ux = X(TD.H0), uy = Y(TD.lam);
+    ctx.strokeStyle = '#d23c3c'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(ux - 14, uy); ctx.lineTo(ux + 14, uy); ctx.moveTo(ux, uy - 14); ctx.lineTo(ux, uy + 14); ctx.stroke();
+    ctx.beginPath(); ctx.arc(ux, uy, 8, 0, 2 * Math.PI); ctx.stroke();
     ctx.restore();
 }
 
@@ -2476,7 +2536,6 @@ function tdTables(T) {
         ['<i>D</i><sub>d</sub>, <i>D</i><sub>s</sub>', `${(d.Dd / 1000).toFixed(3)}, ${(d.Ds / 1000).toFixed(3)} Gpc`],
         ['Time-delay distance <i>D</i><sub>Δt</sub>', (Ddt / 1000).toFixed(3) + ' Gpc'],
         ['Einstein radius at the lens', (TD.thE * PHYS.ARCSEC * d.Dd * 1000).toFixed(2) + ' kpc'],
-        ['Mass inside θ<sub>E</sub>', fmt(massInThetaE(TD.thE, d), 3) + ' M<sub>☉</sub>'],
     ];
     $('td-dist').innerHTML = `<thead><tr><th colspan="2">With your H₀ = ${TD.H0.toFixed(1)}</th></tr></thead><tbody>` + rows.map(r => `<tr><th>${r[0]}</th><td class="v">${r[1]}</td></tr>`).join('') + '</tbody>';
 
@@ -2486,26 +2545,53 @@ function tdTables(T) {
     });
     $('td-res').innerHTML = html + '</tbody>';
 
-    const C = TD.chi, err = (C.hi - C.lo) / 2;
-    $('td-fitout').textContent = C.open ? 'best fit: unconstrained' : `best fit: H₀ = ${C.best.toFixed(1)} ± ${err.toFixed(1)}`;
+    const C = TD.chi, K = tdKin(), comb = tdCombined(K);
+    const { cd, ck } = tdChiPlane(TD.H0, TD.lam, K);
+    const onBand = !C.open && cd < 2.25, onKin = TD.kin && ck < 1;
+    $('td-kin-read').innerHTML = TD.kin
+        ? `Measured: σ<sub>v</sub> = ${K.obs.toFixed(0)} ± ${K.err.toFixed(0)} km/s. Your model (λ = ${TD.lam.toFixed(2)}) predicts ${(K.s1 * Math.sqrt(TD.lam)).toFixed(0)} km/s. Mass sheets change σ<sub>v</sub> but not the images, and H₀ doesn't enter.`
+        : 'The stars in the lens galaxy move faster in a heavier potential. That measures the mass in a way the images can\'t.';
+    $('td-fitout').textContent = C.open ? 'light curves: no constraint' : (TD.kin ? `H₀ = ${comb.H0.toFixed(1)} ± ${comb.err.toFixed(1)} (delays + kinematics)` : `light curves: H₀/λ = ${C.best.toFixed(1)} ± ${C.sig.toFixed(1)}`);
+
     const maxDt = Math.max(...TD.data.map(D => D.dt));
-    let tip;
-    if (maxDt < 3) tip = `<b>Almost no delay.</b> The source sits nearly behind the centre of the lens, so all four paths are almost equally long. The longest delay is only ${(maxDt * 24).toFixed(0)} hours. That is far too short to measure through daily gaps and microlensing wiggles. This is why near-symmetric crosses (like Q2237+0305) are useless for <i>H</i><sub>0</sub>, and why lenses with long delays are prized.`;
-    else if (Math.abs(TD.H0 - C.best) <= Math.max(err, 0.3)) tip = `<b>Lined up.</b> With this lens model, the data say <i>H</i><sub>0</sub> = ${C.best.toFixed(1)} ± ${err.toFixed(1)} km/s/Mpc. That is a ${(100 * err / C.best).toFixed(1)}% measurement, from one lens, with no distance ladder. (Real delays are harder to pin down, to a few percent, because nobody knows the quasar's intrinsic light curve.)` + (TD.lam !== 1 ? ` But your lens model is mass-sheet transformed by λ = ${TD.lam.toFixed(2)}, so this value is off by exactly that factor. Nothing in the image positions or flux ratios can tell you. Breaking the degeneracy takes extra information, such as the stellar velocity dispersion of the lens or the mass along the line of sight.` : ' Press <b>Reveal</b> to compare with the truth, or set λ ≠ 1 and fit again.');
-    else if (TD.H0 < C.best) tip = `Your <i>H</i><sub>0</sub> is too <b>small</b>. A smaller <i>H</i><sub>0</sub> means a bigger universe, a larger <i>D</i><sub>Δt</sub> and <b>longer</b> predicted delays, so the model curves lag behind the data. Slide right, or tick <b>Undo the delays</b> and slide until all colours fall on one curve.`;
-    else tip = `Your <i>H</i><sub>0</sub> is too <b>large</b>: the predicted delays are too short, so the model curves run ahead of the data. Slide left. (Δt ∝ <i>D</i><sub>Δt</sub> ∝ 1/<i>H</i><sub>0</sub>.)`;
-    $('td-tip').innerHTML = tip;
+    let html2;
+    if (C.open) {
+        html2 = `<b>Almost no delay.</b> The source sits nearly behind the centre of the lens, so all four paths are almost equally long. The longest delay is only ${(maxDt * 24).toFixed(0)} hours. That is far too short to measure through daily gaps and microlensing wiggles, so the light curves say nothing about <i>H</i><sub>0</sub> and the plane has no blue band. This is why near-symmetric crosses (like Q2237+0305) are useless for <i>H</i><sub>0</sub>. Pick the quad or the double.`;
+    } else {
+        const steps = [
+            [onBand, '<b>Line up the light curves.</b> Move <i>H</i><sub>0</sub> until the model lines run through the dots (or tick <b>Undo the delays</b> and make the colours fall on one curve). You are then on the blue band.'],
+            [TD.triedLam, '<b>Now change λ.</b> Drag the red cross <b>along</b> the blue band: the curves stay lined up everywhere on it. The light curves only measure <i>H</i><sub>0</sub>/λ, so on their own they can\'t tell you <i>H</i><sub>0</sub>. That is the mass-sheet degeneracy.'],
+            [TD.kin, '<b>Get more information.</b> Tick <b>Measure the lens galaxy\'s velocity dispersion</b>. It constrains λ (the orange band) and knows nothing about <i>H</i><sub>0</sub>.'],
+            [onBand && onKin && cd < 1, '<b>Go to where the bands cross.</b> That point fits both the delays and the kinematics. Its <i>H</i><sub>0</sub> is your measurement.'],
+            [TD.revealed, '<b>Reveal the truth</b> and see how you did. Then try ±10% kinematics (can you still tell the naive model is wrong?), or a new universe.'],
+        ];
+        const now = steps.findIndex(s => !s[0]);
+        html2 = '<ol class="steps">' + steps.map((s, i) => `<li class="${s[0] ? 'done' : i === now ? 'now' : ''}" data-mark="${s[0] ? '✓' : i === now ? '▶' : '○'}"><span>${s[1]}</span></li>`).join('') + '</ol>';
+        let hint = '';
+        if (!onBand) hint = TD.H0 / TD.lam < C.best
+            ? 'Hint: your predicted delays are too <b>long</b> (the model curves lag behind the dots). Increase <i>H</i><sub>0</sub>, or lower λ.'
+            : 'Hint: your predicted delays are too <b>short</b> (the model curves run ahead of the dots). Lower <i>H</i><sub>0</sub>, or raise λ.';
+        else if (TD.kin && !onKin) hint = `Hint: the kinematics want λ ≈ ${K.lamBest.toFixed(2)}. Slide along the blue band towards the orange one.`;
+        else if (onBand && onKin && cd < 1) hint = `<b>Your measurement: <i>H</i><sub>0</sub> = ${comb.H0.toFixed(1)} ± ${comb.err.toFixed(1)} km/s/Mpc</b>. The error is now dominated by the kinematics (±${(100 * K.lamSig / K.lamBest).toFixed(0)}% on λ), not by the light curves (±${(100 * C.delaySig / C.best).toFixed(1)}% from the delays, plus a 2% allowance for the rest of the lens model), just as in real analyses.`;
+        if (hint) html2 += `<p style="margin:8px 0 0">${hint}</p>`;
+    }
+    $('td-tip').innerHTML = html2;
     $('td-status').textContent = `${TD.images.length} images · longest delay ${maxDt.toFixed(1)} days · ${TD.data[0].pts.length} nights of data per image`;
 }
 
 let tdSliders = {}, tdCfgSeg = () => {};
+function tdSetLam(v) {
+    const K = tdKin();
+    if (Math.abs(v - TD.lam) > 1e-9 && tdChiPlane(TD.H0, TD.lam, K).cd < 2.25 && Math.abs(v - 1) > 0.02) TD.triedLam = true;
+    TD.lam = v;
+}
 function tdInit() {
     try { tdR = new LensRenderer($('td-gl')); }
     catch (e) { $('td-status').textContent = 'WebGL is not available here.'; return; }
     if (!labTex.quasar) makeSourceTextures();
     tdR.setTexture(labTex.quasar);
     tdSliders.h0 = slider('td-h0', v => v.toFixed(1), v => { TD.H0 = v; tdDraw(); });
-    tdSliders.lam = slider('td-lam', v => v.toFixed(2), (v, f) => { TD.lam = v; tdScan(f ? 0.1 : 0.4); tdDraw(); });
+    tdSliders.lam = slider('td-lam', v => v.toFixed(2), v => { tdSetLam(v); tdDraw(); });
     tdSliders.th = slider('td-th', v => v.toFixed(2) + '″', (v, f) => { TD.thE = v; tdAll(f); });
     tdSliders.zl = slider('td-zl', v => v.toFixed(2), (v, f) => { TD.zl = v; tdAll(f); });
     tdSliders.zs = slider('td-zs', v => v.toFixed(2), (v, f) => { TD.zs = v; tdAll(f); });
@@ -2518,29 +2604,53 @@ function tdInit() {
     });
     for (const k of ['undo', 'all']) $('td-' + k).addEventListener('change', e => { TD[k] = e.target.checked; tdDraw(); });
     $('td-cont').addEventListener('change', e => { TD.cont = e.target.checked; tdDraw(); });
-    $('td-fit').addEventListener('click', () => { TD.H0 = TD.chi.best; tdSliders.h0.set(TD.H0); tdDraw(); });
+    $('td-kin').addEventListener('change', e => { TD.kin = e.target.checked; tdDraw(); });
+    $('td-kerr').addEventListener('change', e => { TD.kinErr = +e.target.value; tdDraw(); });
+    // drag in the H0–λ plane
+    const pl = $('td-plane');
+    const setFromPlane = e => {
+        const r = pl.getBoundingClientRect(), W = pl.width, H = pl.height, { L, R, T, B } = TD_PL;
+        const px = (e.clientX - r.left) / r.width * W, py = (e.clientY - r.top) / r.height * H;
+        TD.H0 = Math.round(clamp(40 + (px - L) / (W - L - R) * 60, 40, 100) * 10) / 10;
+        tdSetLam(Math.round(clamp(0.7 + (H - B - py) / (H - T - B) * 0.6, 0.7, 1.3) * 100) / 100);
+        tdSliders.h0.set(TD.H0); tdSliders.lam.set(TD.lam);
+        tdDraw();
+    };
+    let drag = false;
+    pl.addEventListener('pointerdown', e => { drag = true; pl.setPointerCapture(e.pointerId); setFromPlane(e); });
+    pl.addEventListener('pointermove', e => { if (drag) setFromPlane(e); });
+    pl.addEventListener('pointerup', () => { drag = false; });
+    pl.addEventListener('pointercancel', () => { drag = false; });
+    $('td-fit').addEventListener('click', () => {
+        if (TD.chi.open) { toast('These light curves don\'t constrain the delays, so there is nothing to fit. Try the quad or the double.'); return; }
+        if (TD.kin) { const c = tdCombined(tdKin()); TD.lam = Math.round(clamp(c.lam, 0.7, 1.3) * 100) / 100; TD.H0 = Math.round(clamp(TD.lam * TD.chi.best, 40, 100) * 10) / 10; }
+        else { TD.H0 = Math.round(clamp(TD.lam * TD.chi.best, 40, 100) * 10) / 10; toast('Fitted <i>H</i><sub>0</sub> at your current λ. Without kinematics, any point on the blue band fits just as well.'); }
+        tdSliders.h0.set(TD.H0); tdSliders.lam.set(TD.lam); tdDraw();
+    });
     $('td-reveal').addEventListener('click', () => {
         TD.revealed = true; tdDraw();
-        const C = TD.chi;
-        let msg = `This universe has <i>H</i><sub>0</sub> = <b>${TD.H0true.toFixed(1)}</b> km/s/Mpc. The data alone give ${C.best.toFixed(1)} ± ${((C.hi - C.lo) / 2).toFixed(1)}.`;
-        if (TD.lam !== 1) msg += ` With λ = ${TD.lam.toFixed(2)} the best fit is pulled to λ × ${TD.H0true.toFixed(1)} = ${(TD.lam * TD.H0true).toFixed(1)}: the mass-sheet degeneracy.`;
-        toast(msg, 'The truth', 9000);
+        const C = TD.chi, K = tdKin(), c = tdCombined(K);
+        let msg = `This universe has <i>H</i><sub>0</sub> = <b>${TD.H0true.toFixed(1)}</b> km/s/Mpc, and its lens is the naive model mass-sheet transformed by λ = <b>${TD.lamTrue.toFixed(2)}</b>.`;
+        if (!C.open) msg += ` The naive model (λ = 1) would have given <i>H</i><sub>0</sub> = ${C.best.toFixed(1)}, off by ${(100 * Math.abs(C.best / TD.H0true - 1)).toFixed(0)}%.` + (TD.kin ? ` With the kinematics: ${c.H0.toFixed(1)} ± ${c.err.toFixed(1)}.` : ' Turn on the kinematics to do better.');
+        toast(msg, 'The truth', 11000);
     });
     $('td-new').addEventListener('click', () => tdNewUniverse());
     tdNewUniverse(TD.seed);
 }
 function tdNewUniverse(seed) {
     TD.seed = seed || Math.floor(Math.random() * 2e9) + 1;
-    TD.H0true = Math.round((62 + 16 * tdRng(TD.seed + 7)()) * 10) / 10;
+    const r = tdRng(TD.seed + 7);
+    TD.H0true = Math.round((62 + 16 * r()) * 10) / 10;
+    TD.lamTrue = Math.round((0.88 + 0.24 * r()) * 100) / 100;
     TD.revealed = false;
     tdAll();
 }
 function tdApply(cfg) {
     const c = cfg.cfg || 'quad';
-    Object.assign(TD, { cfg: 'quad', thE: 1.5, zl: 0.5, zs: 2, H0: 58, lam: 1, undo: false, all: false, cont: true }, TD_CFG[c].set || {}, cfg);
+    Object.assign(TD, { cfg: 'quad', thE: 1.5, zl: 0.5, zs: 2, H0: 75, lam: 1, undo: false, all: false, cont: true, kin: false, triedLam: false }, TD_CFG[c].set || {}, cfg);
     tdSliders.h0.set(TD.H0); tdSliders.lam.set(TD.lam); tdSliders.th.set(TD.thE); tdSliders.zl.set(TD.zl); tdSliders.zs.set(TD.zs);
     tdCfgSeg(TD.cfg);
-    $('td-undo').checked = TD.undo; $('td-all').checked = TD.all; $('td-cont').checked = TD.cont;
+    $('td-undo').checked = TD.undo; $('td-all').checked = TD.all; $('td-cont').checked = TD.cont; $('td-kin').checked = TD.kin;
     TD.revealed = false;
     tdAll();
 }
@@ -2780,8 +2890,8 @@ const EXPERIMENTS = [
     { t: 'Move the source closer', p: 'With a lens in place, slide the source redshift down towards the lens redshift.', show: () => { dfApply({ model: 'sie', state: { sig: 1300, zs: 3 }, lens: { x: 92, y: 90 }, show: { crit: true }, lock: true }); go('deepfield'); }, a: 'The lensing strength depends on <i>D</i><sub>ds</sub>/<i>D</i><sub>s</sub>. It grows quickly at first and then saturates: a source at <i>z</i> = 6 is lensed only a little more strongly than one at <i>z</i> = 3. When the source is at or in front of the lens, nothing is lensed. Because each galaxy in a real deep field is at a different redshift, it sees a slightly different Einstein radius. That difference is what lets lensing measure cosmology.' },
     { t: 'Make the lens sub-critical', p: 'Increase the core radius until the arcs disappear.', show: () => { dfApply({ model: 'sie', state: { sig: 900, q: 0.9, core: 4 }, lens: { x: 92, y: 90 }, show: { crit: true }, lock: true }); go('deepfield'); }, a: 'A core spreads the central mass out. Once the convergence nowhere exceeds 1 (here, roughly when the core is larger than half the Einstein radius), there are no critical curves. Then there are no multiple images and no arcs, only mild magnification. Strong lensing needs a dense centre, so the abundance of arcs constrains how concentrated dark-matter halos are.' },
     { t: 'Read off a time delay', p: 'Put a quasar off-centre behind a round lens and read the table.', show: () => { labApply({ model: 'sie', src: 'quasar', state: { q: 1, sx: 0.3, sy: 0, size: 0.2 } }); go('lab'); }, a: 'For a singular isothermal sphere, Δ<i>t</i> = (<i>D</i><sub>Δt</sub>/2<i>c</i>)(θ<sub>A</sub>² − θ<sub>B</sub>²). Here θ<sub>A</sub> = θ<sub>E</sub> + β and θ<sub>B</sub> = θ<sub>E</sub> − β, so the delay grows linearly with β. The brighter image (the minimum) arrives first. Since <i>D</i><sub>Δt</sub> ∝ 1/<i>H</i><sub>0</sub>, a universe with a 10% larger <i>H</i><sub>0</sub> would show about 9% shorter delays (a factor 1/1.1) for the same lens.' },
-    { t: 'Measure H₀ yourself', p: 'Slide your H₀ until the model light curves line up with the data, then reveal the truth.', show: () => { tdApply({}); go('cosmo'); }, a: 'A larger <i>H</i><sub>0</sub> means a smaller universe: all distances, including <i>D</i><sub>Δt</sub>, shrink as 1/<i>H</i><sub>0</sub>, and so do the predicted delays. Only one value makes the model reproduce the observed delays. Tick <b>Undo the delays</b>: at the right <i>H</i><sub>0</sub>, all four images collapse onto a single light curve. Real programmes (COSMOGRAIL, H0LiCOW, TDCOSMO) do exactly this, with years of monitoring and much more careful lens models.' },
-    { t: 'The mass-sheet degeneracy', p: 'Set the mass-sheet parameter λ to 0.9, fit H₀, and reveal.', show: () => { tdApply({ lam: 0.9 }); go('cosmo'); }, a: 'The transformed model κ → λκ + 1 − λ predicts exactly the same image positions and flux ratios, so the imaging cannot tell it apart from the true lens. But it predicts delays λ times the true ones, so the fitted <i>H</i><sub>0</sub> comes out λ times the true value. That is a 10% error that no amount of light-curve data can remove. In practice the degeneracy is broken, partly, with stellar kinematics of the lens galaxy and by counting the mass along the line of sight. It is the dominant systematic in time-delay cosmography.' },
+    { t: 'Measure H₀ yourself', p: 'Follow the steps under the plots: line up the light curves, discover the degeneracy, break it with kinematics, reveal.', show: () => { tdApply({}); go('cosmo'); }, a: 'A larger <i>H</i><sub>0</sub> means a smaller universe: all distances, including <i>D</i><sub>Δt</sub>, shrink as 1/<i>H</i><sub>0</sub>, and so do the predicted delays. The light curves pin down the delays very well, but delays only measure <i>H</i><sub>0</sub>/λ. Without the kinematics, a lens model with the wrong mass sheet gives a precise but wrong <i>H</i><sub>0</sub>. Real programmes (COSMOGRAIL, H0LiCOW, TDCOSMO) combine years of monitoring with lens models and stellar kinematics in exactly this way.' },
+    { t: 'The mass-sheet degeneracy', p: 'Line up the light curves, then drag the red cross along the blue band in the H₀–λ plane.', show: () => { tdApply({}); go('cosmo'); }, a: 'The transformed model κ → λκ + 1 − λ predicts exactly the same image positions and flux ratios, so the imaging cannot tell it apart from the true lens. But it predicts delays λ times longer, so the fitted <i>H</i><sub>0</sub> comes out λ times larger. Every point on the blue band fits the light curves equally well. The stellar velocity dispersion breaks the degeneracy, because σ<sub>v</sub>² scales with λ and does not depend on <i>H</i><sub>0</sub>. Even then, the kinematics are usually the largest source of error, which is why JWST spectroscopy of lens galaxies matters so much.' },
     { t: 'Why the Einstein Cross is useless for H₀', p: 'Load the near-symmetric cross and try to fit.', show: () => { tdApply({ cfg: 'cross', H0: 70 }); go('cosmo'); }, a: 'With the source almost exactly behind the lens, all four light paths are nearly the same length, so the delays are hours, not weeks. The fit becomes hopeless and the χ² curve is almost flat. Good cosmography lenses have asymmetric image configurations and long delays. Q2237+0305 (the real Einstein Cross) has predicted delays of only hours. It is famous for microlensing instead.' },
     { t: 'A flux-ratio anomaly', p: 'Hide a small dark-matter subhalo next to one image of an Einstein cross.', show: () => { labApply({ model: 'sie', src: 'quasar', state: { q: 0.7, pa: 30, sx: 0.05, sy: 0.03, size: 0.12, sub: true } }); go('lab'); }, a: 'Toggle the subhalo on and off and compare the μ column. The image positions barely change, by much less than 0.1 θ<sub>E</sub>, but the perturbed image\'s magnification jumps. Smooth lens models cannot reproduce such flux ratios. This is how lensing detects dark-matter clumps of 10<sup>8</sup>–10<sup>9</sup> M<sub>☉</sub>, too small to contain any stars, and so tests the nature of dark matter.' },
 ];

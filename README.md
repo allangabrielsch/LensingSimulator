@@ -22,9 +22,12 @@ An interactive gravitational-lensing simulator and primer. It's a single HTML fi
 
 **Time-delay cosmography**
 - A variable quasar behind a quad (or double) lens. Its images flicker with different delays, over three seasons of simulated monitoring with gaps, photometric noise and microlensing drifts.
-- The data come from a universe with a secret H₀. Slide yours until the model delays (Δt ∝ D_Δt ∝ 1/H₀) line up, or tick "undo the delays" and watch the four curves collapse onto one.
-- χ²(H₀), a best fit with an error bar from re-simulated mock data sets, and a reveal button
-- A mass-sheet slider λ: the same images and flux ratios, but delays and inferred H₀ scaled by λ, the main systematic of the method
+- The data come from a universe with a secret H₀, and a lens that is a mass-sheet transform (secret λ) of the naive model. A step-by-step checklist walks you through the analysis:
+  1. Line up the light curves (Δt ∝ λ/H₀), or tick "undo the delays" and watch the four curves collapse onto one.
+  2. Drag along the band in the H₀–λ plane and see that the light curves alone only fix H₀/λ: the mass-sheet degeneracy.
+  3. Add the lens galaxy's stellar velocity dispersion (σ_v² ∝ λ, independent of H₀), with a choice of ±10%, ±5% or ±2% precision.
+  4. Go to where the two bands cross, then reveal the truth.
+- Error bars come from re-simulated mock data sets, plus a 2% floor for the rest of the lens model. In tests, the combined measurement lands within 1σ of the truth in 22 to 26 of 30 random universes, depending on the kinematics precision.
 - Arrival-time (Fermat potential) contours, so you can see that images sit at its minima and saddle points. Also a near-symmetric "Einstein cross" setup, to show why such lenses are useless for H₀.
 
 **Theory**
@@ -37,7 +40,7 @@ An interactive gravitational-lensing simulator and primer. It's a single HTML fi
 
 - Isothermal ellipsoids follow Kormann, Schneider & Bartelmann (1994) and Keeton & Kochanek (1998), with the lenstronomy normalisation (b = θ_E √q, product-averaged Einstein radius). The deflection was checked numerically: ∇·α = 2κ, curl α = 0, and ∇ψ = α.
 - Image finding agrees with the analytic SIS and point-mass solutions to better than 10⁻⁵.
-- Time-delay fits recover the hidden H₀ within the quoted 1σ about 70% of the time (21 of 30 random universes in a test), as they should. The fit uses the true intrinsic quasar light curve as a template, which real analyses do not have, so real delays are harder to measure than these.
+- Time-delay fits use the true intrinsic quasar light curve as a template, which real analyses do not have, so real delays are harder to measure than these. The kinematics follow the simple scaling σ_v² ∝ λ.
 - Cosmology: flat ΛCDM, H₀ = 70 km/s/Mpc, Ωm = 0.3, radiation ignored. D_A(z = 0.5) = 1259 Mpc.
 - The deep field puts every galaxy at one source redshift. Foreground stars get lensed too, which they wouldn't be in reality. Section 7 of the theory lists the other simplifications.
 
