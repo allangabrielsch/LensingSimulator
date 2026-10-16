@@ -20,21 +20,24 @@ An interactive gravitational-lensing simulator and primer. It's a single HTML fi
 - Image positions found numerically (triangle mapping plus Newton), with magnification, parity, image type (minimum, saddle or maximum) and time delays from the Fermat potential
 - Caustics, critical curves and the "cut" of singular lenses. Add a core and the central image comes back. Hide a dark-matter subhalo next to an image to see a flux-ratio anomaly.
 
-**Microlensing**
-- A star (optionally with a planet) in the Milky Way lensing a bulge star, with real units: θ_E in mas, R_E in AU, t_E in days
-- Binary-lens images from the complex fifth-order polynomial, and finite-source light curves (uniform disk) compared with the single-lens Paczyński curve
-- Caustics, the source track (click to reroute it), an animated image-plane view, and the size of the planet's signal
+**Time-delay cosmography**
+- A variable quasar behind a quad (or double) lens. Its images flicker with different delays, over three seasons of simulated monitoring with gaps, photometric noise and microlensing drifts.
+- The data come from a universe with a secret H₀. Slide yours until the model delays (Δt ∝ D_Δt ∝ 1/H₀) line up, or tick "undo the delays" and watch the four curves collapse onto one.
+- χ²(H₀), a best fit with an error bar from re-simulated mock data sets, and a reveal button
+- A mass-sheet slider λ: the same images and flux ratios, but delays and inferred H₀ scaled by λ, the main systematic of the method
+- Arrival-time (Fermat potential) contours, so you can see that images sit at its minima and saddle points. Also a near-symmetric "Einstein cross" setup, to show why such lenses are useless for H₀.
 
 **Theory**
-- From the deflection angle and the lens equation to Einstein radii, convergence and shear, caustics, the odd-number theorem, time delays and H₀, the mass-sheet degeneracy, and weak lensing and microlensing
+- From the deflection angle and the lens equation to Einstein radii, convergence and shear, caustics, the odd-number theorem, time delays and H₀, the mass-sheet degeneracy, and weak and microlensing
 - An interactive side-view ray diagram with what the observer sees, and an Einstein-radius calculator (cosmological or Galactic distances)
 - Famous lenses (1919 eclipse, Twin Quasar, Einstein Cross, Abell 370, Cosmic Horseshoe, Bullet Cluster, OGLE-2005-BLG-390Lb, SN Refsdal, Earendel), most of which load as lookalikes into the simulators
-- Thirteen guided experiments, each with a "Show me" button and an explanation
+- Fourteen guided experiments, each with a "Show me" button and an explanation
 
 ## Accuracy
 
 - Isothermal ellipsoids follow Kormann, Schneider & Bartelmann (1994) and Keeton & Kochanek (1998), with the lenstronomy normalisation (b = θ_E √q, product-averaged Einstein radius). The deflection was checked numerically: ∇·α = 2κ, curl α = 0, and ∇ψ = α.
-- Image finding agrees with the analytic SIS and point-mass solutions to better than 10⁻⁵, and the binary-lens solver agrees with an independent triangle-mapping solver.
+- Image finding agrees with the analytic SIS and point-mass solutions to better than 10⁻⁵.
+- Time-delay fits recover the hidden H₀ within the quoted 1σ about 70% of the time (21 of 30 random universes in a test), as they should. The fit uses the true intrinsic quasar light curve as a template, which real analyses do not have, so real delays are harder to measure than these.
 - Cosmology: flat ΛCDM, H₀ = 70 km/s/Mpc, Ωm = 0.3, radiation ignored. D_A(z = 0.5) = 1259 Mpc.
 - The deep field puts every galaxy at one source redshift. Foreground stars get lensed too, which they wouldn't be in reality. Section 7 of the theory lists the other simplifications.
 
