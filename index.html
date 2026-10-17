@@ -62,6 +62,7 @@
             --s2: #eb6834;
             --s3: #1baf7a;
             --warn-bg: #f6e7c8;
+            --arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 6'%3E%3Cpath d='M0 0h9L4.5 6z' fill='%231d1d1b'/%3E%3C/svg%3E");
             color-scheme: light;
         }
         @media (prefers-color-scheme: dark) {
@@ -74,6 +75,7 @@
                 --grid: #2e2e2c; --axis: #8a877e;
                 --s1: #3987e5; --s2: #d95926; --s3: #199e70;
                 --warn-bg: #3a3222;
+                --arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 6'%3E%3Cpath d='M0 0h9L4.5 6z' fill='%23e6e4dc'/%3E%3C/svg%3E");
                 color-scheme: dark;
             }
         }
@@ -86,6 +88,7 @@
             --grid: #2e2e2c; --axis: #8a877e;
             --s1: #3987e5; --s2: #d95926; --s3: #199e70;
             --warn-bg: #3a3222;
+            --arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 6'%3E%3Cpath d='M0 0h9L4.5 6z' fill='%23e6e4dc'/%3E%3C/svg%3E");
             color-scheme: dark;
         }
 
@@ -195,7 +198,9 @@
         }
 
         h2 { margin: 0 0 10px; font: 600 16px var(--sans); }
-        h3 { margin: 18px 0 8px; font: 600 13px var(--sans); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+        h3, legend { display: flex; align-items: center; gap: 8px; width: 100%; margin: 18px 0 8px; padding: 0; font: 600 13px var(--sans); color: var(--muted); }
+        /* an etched groove after every section label, the one divider used inside windows */
+        h3::after, legend::after { content: ""; flex: 1 1 auto; border-top: 1px solid var(--bevel-lo); border-bottom: 1px solid var(--bevel-hi); }
         h3:first-child { margin-top: 0; }
         p { margin: 0 0 10px; }
         .win a { color: var(--link); }
@@ -208,7 +213,7 @@
         .btn {
             min-height: 32px;
             padding: 5px 14px;
-            font: 600 13.5px var(--sans);
+            font: 13.5px var(--sans);
             color: var(--win-text);
             background: var(--win);
             border: 2px solid;
@@ -224,14 +229,15 @@
         .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
         .row > * { flex: 0 0 auto; }
         .seg { display: flex; flex-wrap: wrap; gap: 4px; }
-        .seg .btn { flex: 1 1 auto; padding: 4px 10px; min-height: 30px; font-size: 13px; }
+        .seg .btn { flex: 0 1 auto; padding: 3px 12px; min-height: 28px; font-size: 13px; }
 
         select {
+            appearance: none;
             min-height: 30px;
-            padding: 2px 6px;
+            padding: 2px 26px 2px 6px;
+            background: var(--arrow) no-repeat right 6px center / 9px 6px, linear-gradient(90deg, var(--bevel-hi) 0 1px, var(--win) 1px) no-repeat right 0 top 0 / 21px 100%, var(--well);
             font: 13.5px var(--sans);
             color: var(--well-text);
-            background: var(--well);
             border: 2px solid;
             border-color: var(--bevel-lo) var(--bevel-hi) var(--bevel-hi) var(--bevel-lo);
             border-radius: 0;
@@ -249,6 +255,33 @@
         }
         input:focus-visible, select:focus-visible { outline: 2px solid var(--s1); outline-offset: 0; }
 
+        /* trackbars: a sunken groove and a raised, rectangular thumb with a grip line */
+        input[type="range"] { appearance: none; -webkit-appearance: none; height: 22px; margin: 0; background: transparent; cursor: pointer; }
+        input[type="range"]::-webkit-slider-runnable-track { box-sizing: border-box; height: 6px; background: var(--well); border: 1px solid; border-color: var(--bevel-dark) var(--bevel-hi) var(--bevel-hi) var(--bevel-dark); }
+        input[type="range"]::-moz-range-track { box-sizing: border-box; height: 6px; background: var(--well); border: 1px solid; border-color: var(--bevel-dark) var(--bevel-hi) var(--bevel-hi) var(--bevel-dark); }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; box-sizing: border-box; width: 12px; height: 20px; margin-top: -8px;
+            background: linear-gradient(90deg, transparent 4px, var(--bevel-lo) 4px 5px, var(--bevel-hi) 5px 6px, transparent 6px) var(--win);
+            border: 2px solid; border-color: var(--bevel-hi) var(--bevel-dark) var(--bevel-dark) var(--bevel-hi); border-radius: 0;
+        }
+        input[type="range"]::-moz-range-thumb {
+            box-sizing: border-box; width: 12px; height: 20px;
+            background: linear-gradient(90deg, transparent 4px, var(--bevel-lo) 4px 5px, var(--bevel-hi) 5px 6px, transparent 6px) var(--win);
+            border: 2px solid; border-color: var(--bevel-hi) var(--bevel-dark) var(--bevel-dark) var(--bevel-hi); border-radius: 0;
+        }
+        input[type="range"]:focus-visible { outline: 1px dotted var(--win-text); outline-offset: 1px; }
+
+        /* checkboxes: a sunken white square with a drawn tick */
+        input[type="checkbox"] {
+            appearance: none; -webkit-appearance: none; display: inline-grid; place-content: center; flex: 0 0 auto;
+            width: 15px; height: 15px; margin: 0; background: var(--well); cursor: pointer;
+            border: 2px solid; border-color: var(--bevel-lo) var(--bevel-hi) var(--bevel-hi) var(--bevel-lo);
+            box-shadow: inset 1px 1px 0 var(--bevel-dark);
+        }
+        input[type="checkbox"]::before { content: ""; width: 9px; height: 9px; background: var(--well-text); clip-path: polygon(0 52%, 14% 38%, 38% 62%, 86% 8%, 100% 22%, 38% 90%); transform: scale(0); }
+        input[type="checkbox"]:checked::before { transform: scale(1); }
+        input[type="checkbox"]:focus-visible { outline: 1px dotted var(--win-text); outline-offset: 2px; }
+
         /* slider rows: label | slider | value */
         .ctl {
             display: grid;
@@ -258,22 +291,17 @@
             margin: 2px 0;
             font-size: 13.5px;
         }
-        .ctl input[type="range"] { width: 100%; margin: 0; accent-color: var(--title-bg); }
+        .ctl input[type="range"] { width: 100%; }
         .ctl output { font: 12.5px var(--mono); text-align: right; white-space: nowrap; }
         .ctl.off { opacity: 0.4; }
         .ctl.off input { pointer-events: none; }
         .checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 3px 12px; }
         .check { display: flex; align-items: center; gap: 6px; font-size: 13.5px; cursor: pointer; }
-        .check input { width: 16px; height: 16px; margin: 0; accent-color: var(--title-bg); }
 
-        fieldset {
-            margin: 0 0 12px;
-            padding: 8px 10px 10px;
-            border: 2px groove var(--bevel-hi);
-            border-color: var(--bevel-lo) var(--bevel-hi) var(--bevel-hi) var(--bevel-lo);
-            min-width: 0;
-        }
-        legend { padding: 0 4px; font: 600 12px var(--sans); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+
+        fieldset { margin: 0 0 14px; padding: 0; border: 0; min-width: 0; }
+        legend { float: left; margin: 0 0 8px; }
+        legend + * { clear: both; }
 
         /* ---------- canvases ---------- */
         .well {
@@ -298,7 +326,7 @@
         ol.steps li.done { color: var(--well-text); }
         ol.steps li.now { color: var(--well-text); font-weight: 600; }
         ol.steps li::before { content: attr(data-mark); font-family: var(--mono); }
-        .td { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 14px; align-items: start; }
+        .td { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 14px; align-items: start; }
         .ctl-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 0 16px; margin-top: 14px; }
         @media (max-width: 860px) {
             .sim, .td { grid-template-columns: minmax(0, 1fr); }
@@ -307,6 +335,7 @@
             .lab { grid-template-columns: minmax(0, 1fr); }
             .ctl { grid-template-columns: 6.8em minmax(0, 1fr) 5.2em; font-size: 13px; }
             .win-body { padding: 12px; }
+            .titlebar .path { display: none; }
         }
 
         /* ---------- results tables ---------- */
@@ -315,7 +344,8 @@
         table.res th, table.res td { padding: 3px 8px; text-align: left; vertical-align: baseline; border-bottom: 1px solid var(--grid); }
         table.res th { font-weight: 400; }
         table.res td.v { font: 12.5px var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
-        table.res thead th { font-weight: 600; font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+        #df-res th { white-space: nowrap; }
+        table.res thead th { font-weight: 600; font-size: 12.5px; color: var(--muted); }
         table.res tr:last-child th, table.res tr:last-child td { border-bottom: 0; }
         .swatch { display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 50%; vertical-align: -1px; }
 
@@ -344,6 +374,7 @@
         .theory p, .theory ul { max-width: none; }
         .theory h2 { margin: 26px 0 8px; font: 400 1.45rem var(--serif); }
         .theory h2:first-child { margin-top: 0; }
+        .theory h2 { scroll-margin-top: 12px; }
         .theory h2 .num { color: var(--muted); margin-right: 6px; }
         .eq {
             position: relative;
@@ -355,11 +386,10 @@
             border: 2px solid;
             border-color: var(--bevel-lo) var(--bevel-hi) var(--bevel-hi) var(--bevel-lo);
         }
-        .eq math { font-family: 'LensMath', 'STIX Two Math', 'Cambria Math', math; font-size: 1.3rem; }
+        math { font-family: 'LensMath', 'STIX Two Math', 'Cambria Math', math; font-size: 1.08em; }
+        .eq math { font-size: 1.3rem; }
         .eq .tag { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font: 12px var(--mono); color: var(--muted); }
         @media (max-width: 600px) { .eq { padding: 10px 12px 22px; } .eq .tag { top: auto; bottom: 4px; transform: none; } }
-        .hat { position: relative; display: inline-block; }
-        .hat::after { content: '^'; position: absolute; left: 0.12em; top: -0.42em; font-size: 0.8em; font-style: normal; }
         .m { font-family: var(--serif); font-size: 1.07em; white-space: nowrap; }
         .m i, .eq i { font-style: italic; }
         .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 2px; }
@@ -391,7 +421,7 @@
         .card {
             display: flex;
             flex-direction: column;
-            padding: 12px 14px;
+            padding: 0 14px 12px;
             background: var(--well);
             color: var(--well-text);
             border: 2px solid;
@@ -402,19 +432,21 @@
         .card .meta { font: 12px var(--mono); color: var(--muted); margin-bottom: 8px; }
         .card p { margin: 0 0 8px; }
         .card .btn { align-self: flex-start; margin-top: auto; }
-        .card svg { display: block; margin: 0 auto 8px; }
+        .card svg { display: block; width: calc(100% + 28px); height: 92px; margin: 0 -14px 10px; background: radial-gradient(ellipse at 50% 50%, #0d1430, #05070f 75%); border-bottom: 2px solid var(--bevel-lo); }
 
         /* ---------- experiments ---------- */
-        ol.exp { margin: 0; padding: 0; list-style: none; counter-reset: exp; }
+        ol.exp { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 0 28px; align-items: start; margin: 0; padding: 0; list-style: none; counter-reset: exp; }
         ol.exp > li {
             counter-increment: exp;
             display: grid;
             grid-template-columns: 2.2em minmax(0, 1fr);
             gap: 0 10px;
             padding: 12px 0;
-            border-bottom: 1px solid var(--axis);
+            border-top: 1px solid var(--axis);
         }
-        ol.exp > li:last-child { border-bottom: 0; }
+        ol.exp .go { display: flex; align-items: flex-start; gap: 14px; }
+        ol.exp .go .btn { flex: 0 0 auto; }
+        ol.exp .go details { flex: 1 1 0; min-width: 0; margin-top: 5px; }
         ol.exp > li::before {
             content: counter(exp);
             font: 400 1.6rem/1 var(--serif);
@@ -431,7 +463,7 @@
         .refs { padding-left: 20px; font-size: 14px; }
         .refs li { margin: 4px 0; }
 
-        .video { position: relative; width: 100%; max-width: 720px; aspect-ratio: 16 / 9; background: #000; border: 2px solid; border-color: var(--bevel-lo) var(--bevel-hi) var(--bevel-hi) var(--bevel-lo); }
+        .video { position: relative; width: 100%; max-width: 560px; aspect-ratio: 16 / 9; background: #000; border: 2px solid; border-color: var(--bevel-lo) var(--bevel-hi) var(--bevel-hi) var(--bevel-lo); }
         .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
         .video button { position: absolute; inset: 0; width: 100%; height: 100%; display: grid; place-items: center; gap: 4px; align-content: center; color: #e9e6dc; background: radial-gradient(circle at 50% 45%, #1b2440, #05070f 70%); border: 0; cursor: pointer; font: 14px var(--sans); }
         .video button .play { width: 64px; height: 44px; background: #b3261e; border-radius: 10px; display: grid; place-items: center; font-size: 20px; color: #fff; }
@@ -650,7 +682,7 @@
 
     <!-- ================= time-delay cosmography ================= -->
     <section id="cosmo" class="win not-embed" aria-labelledby="td-t">
-        <div class="titlebar"><span id="td-t">Time-delay cosmography: measure H₀ yourself</span><span class="path">~/lensing/timedelays</span></div>
+        <div class="titlebar"><span id="td-t">Time-delay cosmography: measure <i>H</i><sub>0</sub> yourself</span><span class="path">~/lensing/timedelays</span></div>
         <div class="win-body">
             <p>A quasar flickers on its own, by a few tenths of a magnitude over weeks to months. Every lensed image shows the same flicker, but each one arrives late by a different amount. The light took paths of different lengths, through different depths of the lens potential. All those delays scale with the time-delay distance <i>D</i><sub>Δt</sub>, and <i>D</i><sub>Δt</sub> ∝ 1/<i>H</i><sub>0</sub>. Below are three seasons of simulated monitoring from a universe with a <b>secret</b> Hubble constant. Your job: find it. The steps below the plots walk you through it.</p>
             <div class="td">
@@ -674,7 +706,7 @@
                         <p class="small" style="margin:4px 0 8px">Images and flux ratios only fix the lens up to a mass-sheet transformation, κ → λκ + 1 − λ. Every λ fits them equally well, but the predicted delays scale with λ. λ = 1 is the "naive" model.</p>
                         <div class="row">
                             <button id="td-fit" class="btn small-btn" type="button">Fit for me</button>
-                            <button id="td-reveal" class="btn small-btn" type="button">Reveal the true H₀</button>
+                            <button id="td-reveal" class="btn small-btn" type="button">Reveal the true <i>H</i><sub>0</sub></button>
                             <button id="td-new" class="btn small-btn" type="button">New universe</button>
                         </div>
                     </fieldset>
@@ -688,7 +720,7 @@
                         <legend>Show</legend>
                         <div class="checks">
                             <label class="check"><input type="checkbox" id="td-undo"> Undo the delays</label>
-                            <label class="check"><input type="checkbox" id="td-all"> All three seasons</label>
+                            <label class="check"><input type="checkbox" id="td-zoom"> Zoom in on season 1</label>
                             <label class="check"><input type="checkbox" id="td-cont" checked> Arrival-time contours</label>
                         </div>
                     </fieldset>
@@ -721,13 +753,13 @@
         <div class="titlebar"><span id="th-t">Theory: how a lens made of gravity works</span><span class="path">~/lensing/theory.tex</span></div>
         <div class="win-body theory">
 
-            <h2><span class="num">1</span>Light falls, too</h2>
+            <h2 id="th-1"><span class="num">1</span>Light falls, too</h2>
             <p>In general relativity, light travels along the straightest possible paths (null geodesics) through curved spacetime. Near a mass those paths bend. A light ray passing a compact mass <i>M</i> at impact parameter ξ, far outside the mass, is deflected by</p>
             <div class="eq"><math display="block"><mover accent="true"><mi>α</mi><mo>^</mo></mover><mo>=</mo><mfrac><mrow><mn>4</mn><mi>G</mi><mi>M</mi></mrow><mrow><msup><mi>c</mi><mn>2</mn></msup><mi>ξ</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>2</mn><msub><mi>R</mi><mtext>S</mtext></msub></mrow><mrow><mi>ξ</mi></mrow></mfrac></math><span class="tag">(1)</span></div>
             <p>where <i>R</i><sub>S</sub> = 2<i>GM</i>/<i>c</i><sup>2</sup> is the Schwarzschild radius. This is a weak-field result, valid when ξ ≫ <i>R</i><sub>S</sub>, which is true for every lens on this page. For light grazing the Sun it gives <b>1.75″</b>. If you treat light as Newtonian particles moving at <i>c</i>, you get exactly half of that, 0.87″. Johann von Soldner did that calculation around 1801, and Einstein got the same half value in 1911, before he finished general relativity (0.84″ and 0.83″ with the solar data of their day). The extra factor of 2 comes from the curvature of space itself. In 1919, Dyson, Eddington and Davidson measured stars near the eclipsed Sun and found the full value. That result made Einstein famous overnight.</p>
-            <p>For every lens on this page the deflection is tiny: <span class="hat">α</span> is at most a few tens of arcseconds. That allows two very good approximations. First, the <b>thin-lens approximation</b>: all the bending happens in a single plane, because the lens is far thinner than the distances involved. Second, all angles are small, so sin θ ≈ tan θ ≈ θ.</p>
+            <p>For every lens on this page the deflection is tiny: <math><mover accent="true"><mi>α</mi><mo>^</mo></mover></math> is at most a few tens of arcseconds. That allows two very good approximations. First, the <b>thin-lens approximation</b>: all the bending happens in a single plane, because the lens is far thinner than the distances involved. Second, all angles are small, so sin θ ≈ tan θ ≈ θ.</p>
 
-            <h2><span class="num">2</span>The lens equation</h2>
+            <h2 id="th-2"><span class="num">2</span>The lens equation</h2>
             <p>Put the observer, the lens and the source on a line, at angular-diameter distances <i>D</i><sub>d</sub> (to the lens, the "deflector"), <i>D</i><sub>s</sub> (to the source) and <i>D</i><sub>ds</sub> (from lens to source). Note that in an expanding universe <i>D</i><sub>ds</sub> ≠ <i>D</i><sub>s</sub> − <i>D</i><sub>d</sub>. The source sits at true angular position <b>β</b> on the sky. We see it at angle <b>θ</b> instead. Simple geometry gives the <b>lens equation</b>:</p>
             <div class="eq"><math display="block"><mi>𝛃</mi><mo>=</mo><mi>𝛉</mi><mo>−</mo><mfrac><mrow><msub><mi>D</mi><mtext>ds</mtext></msub></mrow><mrow><msub><mi>D</mi><mtext>s</mtext></msub></mrow></mfrac><mover accent="true"><mi>𝛂</mi><mo>^</mo></mover><mo stretchy="false">(</mo><msub><mi>D</mi><mtext>d</mtext></msub><mi>𝛉</mi><mo stretchy="false">)</mo><mo>≡</mo><mi>𝛉</mi><mo>−</mo><mi>𝛂</mi><mo stretchy="false">(</mo><mi>𝛉</mi><mo stretchy="false">)</mo></math><span class="tag">(2)</span></div>
             <p>It maps each image position θ to exactly one source position β. Going the other way, from β back to θ, is what makes lensing interesting: one β can have <b>several</b> solutions θ. Each solution is an image. The simulators on this page do exactly this: for every pixel θ they compute β = θ − α(θ) and look up the colour of the source there. This is called inverse ray-tracing.</p>
@@ -756,7 +788,7 @@
                 <p class="small">Side view, drag the source up and down. The vertical scale is stretched by a huge factor: real deflections are arcseconds, not tens of degrees. Solid lines are the actual light paths, which bend once, at the lens plane. Dashed lines show where the observer thinks the light came from. With no lens, the faint straight line would be the only path.</p>
             </div>
 
-            <h2><span class="num">3</span>The Einstein radius</h2>
+            <h2 id="th-3"><span class="num">3</span>The Einstein radius</h2>
             <p>If the source sits exactly behind a round lens (β = 0), symmetry turns its image into a ring, the <b>Einstein ring</b>. Its angular radius θ<sub>E</sub> sets the scale of everything in strong lensing. For a point mass:</p>
             <div class="eq"><math display="block"><msub><mi>θ</mi><mtext>E</mtext></msub><mo>=</mo><msqrt><mfrac><mrow><mn>4</mn><mi>G</mi><mi>M</mi></mrow><mrow><msup><mi>c</mi><mn>2</mn></msup></mrow></mfrac><mo>⁢</mo><mfrac><mrow><msub><mi>D</mi><mtext>ds</mtext></msub></mrow><mrow><msub><mi>D</mi><mtext>d</mtext></msub><msub><mi>D</mi><mtext>s</mtext></msub></mrow></mfrac></msqrt><mo>,</mo><mspace width="2em"/><msub><mi>θ</mi><mo>±</mo></msub><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mrow><mo>(</mo><mi>β</mi><mo>±</mo><msqrt><msup><mi>β</mi><mn>2</mn></msup><mo>+</mo><mn>4</mn><msubsup><mi>θ</mi><mtext>E</mtext><mn>2</mn></msubsup></msqrt><mo>)</mo></mrow></math><span class="tag">(3)</span></div>
             <p>A point mass always makes two images, one on each side. Galaxies are better described by the <b>singular isothermal sphere</b> (SIS). Its density falls as ρ ∝ <i>r</i><sup>−2</sup>, which is what gives galaxies their flat rotation curves. Its strength is set by the stellar velocity dispersion σ<sub>v</sub>. It deflects every ray by the same angle, θ<sub>E</sub>:</p>
@@ -801,30 +833,49 @@
                 <div>
                     <div id="calc-warn" class="warnbox" role="status"></div>
                     <div class="table-wrap"><table class="res" id="calc-res"></table></div>
-                    <p class="note">Flat ΛCDM with H₀ = 70 km/s/Mpc and Ω<sub>m</sub> = 0.3. For other cosmologies (and many more distances), see the <a href="https://allangabrielsch.github.io/CosmologyToolbox/#lensing" target="_blank" rel="noopener">Cosmology Toolbox</a>.</p>
+                    <p class="note">Flat ΛCDM with <i>H</i><sub>0</sub> = 70 km/s/Mpc and Ω<sub>m</sub> = 0.3. For other cosmologies (and many more distances), see the <a href="https://allangabrielsch.github.io/CosmologyToolbox/#lensing" target="_blank" rel="noopener">Cosmology Toolbox</a>.</p>
                 </div>
             </div>
 
-            <h2><span class="num">4</span>Magnification, critical curves and caustics</h2>
+            <h2 id="th-4"><span class="num">4</span>Magnification, critical curves and caustics</h2>
             <p>It is convenient to write the deflection as the gradient of a <b>lensing potential</b> ψ, <b>α</b> = ∇ψ, which itself obeys a 2D Poisson equation, ∇²ψ = 2κ. Here κ = Σ/Σ<sub>cr</sub> is the <b>convergence</b>: the projected surface density in units of the critical one. How a small patch of the source gets distorted is described by the Jacobian of the lens equation:</p>
             <div class="eq"><math display="block"><mi>𝐀</mi><mo>=</mo><mfrac><mrow><mo>∂</mo><mi>𝛃</mi></mrow><mrow><mo>∂</mo><mi>𝛉</mi></mrow></mfrac><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><mn>1</mn><mo>−</mo><mi>κ</mi><mo>−</mo><msub><mi>γ</mi><mn>1</mn></msub></mtd><mtd><mo>−</mo><msub><mi>γ</mi><mn>2</mn></msub></mtd></mtr><mtr><mtd><mo>−</mo><msub><mi>γ</mi><mn>2</mn></msub></mtd><mtd><mn>1</mn><mo>−</mo><mi>κ</mi><mo>+</mo><msub><mi>γ</mi><mn>1</mn></msub></mtd></mtr></mtable><mo>)</mo></mrow><mo>,</mo><mspace width="2em"/><mi>μ</mi><mo>=</mo><mfrac><mrow><mn>1</mn></mrow><mrow><mo>det</mo><mi>𝐀</mi></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>1</mn></mrow><mrow><msup><mrow><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>κ</mi><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><msup><mi>γ</mi><mn>2</mn></msup></mrow></mfrac></math><span class="tag">(6)</span></div>
             <p>Convergence κ magnifies images the same way in every direction. Shear γ stretches them along one direction. Lensing never creates or destroys photons, and it <b>conserves surface brightness</b>. So a magnified image is not brighter per square arcsecond. It is <b>bigger</b>, and the total flux grows by |μ|. Images with μ &lt; 0 are mirror images: they have negative parity.</p>
             <p>Where det <b>A</b> = 0, the magnification formally becomes infinite. In the image plane these points form the <b>critical curves</b> (red in the simulators). Mapped back to the source plane, they become the <b>caustics</b> (yellow). Caustics divide the source plane into regions with different numbers of images. Each time a source crosses a caustic, the image count changes by two: a pair of images is born or merges on the critical curve. A <b>tangential</b> critical curve (1 − κ − γ = 0) stretches images tangentially into arcs. A <b>radial</b> one (1 − κ + γ = 0) stretches them radially. Smooth parts of a caustic are <b>folds</b> (two images merge), and the sharp points are <b>cusps</b> (three images merge).</p>
             <div class="aside"><b>The odd-number theorem</b>A smooth, non-singular lens always makes an <b>odd</b> number of images (1, 3, 5, …, as long as the source is not exactly on a caustic). Cluster lenses can make 7 or more. So why do we usually see 2 or 4? The extra image forms near the dense centre of the lens. It is strongly demagnified, and the lens galaxy's own light usually drowns it out. A perfectly singular isothermal lens destroys that image completely. Its boundary in the source plane is then not a caustic but a <b>cut</b> (dashed orange in the lens lab). Give the lens a core in the lens lab and watch the faint central image appear.</div>
 
-            <h2><span class="num">5</span>Time delays and the Hubble constant</h2>
+            <h2 id="th-5"><span class="num">5</span>Time delays and the Hubble constant</h2>
             <p>Each image is a different path from the source to us, and different paths take different times. The arrival time, relative to an undeflected ray, is the <b>Fermat potential</b>:</p>
             <div class="eq"><math display="block"><mi>t</mi><mo stretchy="false">(</mo><mi>𝛉</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><msub><mi>D</mi><mrow><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msub></mrow><mrow><mi>c</mi></mrow></mfrac><mrow><mo>[</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><msup><mrow><mo stretchy="false">(</mo><mi>𝛉</mi><mo>−</mo><mi>𝛃</mi><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mi>ψ</mi><mo stretchy="false">(</mo><mi>𝛉</mi><mo stretchy="false">)</mo><mo>]</mo></mrow><mo>,</mo><mspace width="2em"/><msub><mi>D</mi><mrow><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow></msub><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>+</mo><msub><mi>z</mi><mtext>d</mtext></msub><mo stretchy="false">)</mo><mfrac><mrow><msub><mi>D</mi><mtext>d</mtext></msub><msub><mi>D</mi><mtext>s</mtext></msub></mrow><mrow><msub><mi>D</mi><mtext>ds</mtext></msub></mrow></mfrac><mo>∝</mo><mfrac><mrow><mn>1</mn></mrow><mrow><msub><mi>H</mi><mn>0</mn></msub></mrow></mfrac></math><span class="tag">(7)</span></div>
-            <p>The first term is the geometric delay (bent paths are longer). The second is the <b>Shapiro delay</b> (light passing through a potential well is slowed down). Images form where <i>t</i> is stationary: at minima, saddle points and maxima of the arrival-time surface. That is Fermat's principle, applied to gravity. If the source varies, as a quasar or a supernova does, the variation shows up in each image at a different time. A measured delay gives <i>D</i><sub>Δ<i>t</i></sub>, and with it the Hubble constant <i>H</i><sub>0</sub>, in a single step and without any distance ladder. Sjur Refsdal proposed exactly this in 1964. You can try it in the <a href="#cosmo">time-delay box</a>. The catch is that you need the lens potential ψ. The <b>mass-sheet degeneracy</b> is the main reason that is hard: adding a uniform sheet of mass while rescaling the lens (κ → λκ + 1 − λ, with the unobservable source position rescaled to λβ) changes neither the image positions nor the flux ratios, but it scales every time delay by λ.</p>
+            <p>The first term is the geometric delay (bent paths are longer). The second is the <b>Shapiro delay</b> (light passing through a potential well is slowed down). Images form where <i>t</i> is stationary: at minima, saddle points and maxima of the arrival-time surface. That is Fermat's principle, applied to gravity. If the source varies, as a quasar or a supernova does, the variation shows up in each image at a different time. A measured delay gives <i>D</i><sub>Δ<i>t</i></sub>, and with it the Hubble constant <i>H</i><sub>0</sub>, in a single step and without any distance ladder. Sjur Refsdal proposed exactly this in 1964. You can try it in the <a href="#cosmo">time-delay box</a>. The catch is that you need the lens potential ψ, and the images alone do not quite pin it down. That is the subject of the next section.</p>
 
-            <h2><span class="num">6</span>Strong, weak and micro</h2>
+            <h2 id="th-6"><span class="num">6</span>The mass-sheet degeneracy</h2>
+            <p>Take any lens model that reproduces the observed images: a convergence κ(θ) and a source position β. Now build a second model. Scale the lens down by a factor λ and add a uniform sheet of convergence 1 − λ on top. A uniform sheet pulls every ray towards the centre by an angle proportional to its distance, here (1 − λ)θ, just like a uniform disk would. So the new lens equation is simply λ times the old one:</p>
+            <div class="eq"><math display="block"><msub><mi>κ</mi><mi>λ</mi></msub><mo>=</mo><mi>λ</mi><mi>κ</mi><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><mo>,</mo><mspace width="2em"/><mi>𝛉</mi><mo>−</mo><msub><mi>𝛂</mi><mi>λ</mi></msub><mo stretchy="false">(</mo><mi>𝛉</mi><mo stretchy="false">)</mo><mo>=</mo><mi>λ</mi><mrow><mo>[</mo><mi>𝛉</mi><mo>−</mo><mi>𝛂</mi><mo stretchy="false">(</mo><mi>𝛉</mi><mo stretchy="false">)</mo><mo>]</mo></mrow><mo>=</mo><mi>λ</mi><mi>𝛃</mi></math><span class="tag">(8)</span></div>
+            <p>The images land exactly where they were. Only the source has moved, from β to λβ, and nobody ever gets to see the source without the lens in front of it. The Jacobian of the lens equation is multiplied by λ as well (<b>A</b> → λ<b>A</b>), so every image gets the same extra magnification 1/λ². That leaves the flux ratios untouched, and flux ratios are all we can measure, since we don't know how bright the source really is. Even the shapes of extended arcs come out identical, as long as the source is also λ times smaller. No image you will ever take can tell the two lenses apart. Their arrival-time surfaces do differ, though: <i>t</i>(θ) is scaled by λ, and so is every delay.</p>
+            <div class="eq"><math display="block"><msub><mi>μ</mi><mi>λ</mi></msub><mo>=</mo><mfrac><mi>μ</mi><msup><mi>λ</mi><mn>2</mn></msup></mfrac><mo>,</mo><mspace width="2em"/><mi mathvariant="normal">Δ</mi><msub><mi>t</mi><mi>λ</mi></msub><mo>=</mo><mi>λ</mi><mspace width="0.1em"/><mi mathvariant="normal">Δ</mi><mi>t</mi><mo>∝</mo><mfrac><mi>λ</mi><msub><mi>H</mi><mn>0</mn></msub></mfrac></math><span class="tag">(9)</span></div>
+            <p>A measured delay therefore only fixes <i>H</i><sub>0</sub>/λ. If the true lens has λ = 0.9 and you model it with λ = 1, your <i>H</i><sub>0</sub> comes out 10% too high, and nothing in the data warns you. Move λ below: the image positions and the flux ratio stay put, while the source, the delay and the inferred <i>H</i><sub>0</sub> all move.</p>
+            <div class="figure">
+                <div class="well"><canvas id="mst-canvas" width="900" height="340" style="display:block;width:100%;height:auto" role="img" aria-label="Left: the convergence profile of an isothermal lens and of its mass-sheet transform. Right: their arrival-time curves along the line through lens and source, with the same image positions but different delays."></canvas></div>
+                <div class="ctl-cols" style="margin-top:10px">
+                    <label class="ctl"><span>Mass sheet λ</span><input id="mst-lam" type="range" min="0.7" max="1.3" step="0.01" value="1.15"><output id="mst-lam-o"></output></label>
+                    <label class="ctl"><span>Source β</span><input id="mst-b" type="range" min="0.05" max="0.9" step="0.01" value="0.35"><output id="mst-b-o"></output></label>
+                </div>
+                <div class="table-wrap" style="margin-top:8px"><table class="res" id="mst-res"></table></div>
+                <p class="small">Grey: a singular isothermal sphere with θ<sub>E</sub> = 1″ at <i>z</i><sub>lens</sub> = 0.5, <i>z</i><sub>source</sub> = 2, with the source at β. Blue: its mass-sheet transform. The mean convergence inside θ<sub>E</sub> is 1 for every λ, so the Einstein radius never changes. Both arrival-time curves are stationary at the same two image positions, A and B, but B arrives λ times later.</p>
+            </div>
+            <div class="aside"><b>A lens that hides itself</b>A uniform sheet with κ = 1, on its own, is a perfect lens. It deflects every ray by exactly α = θ, so the whole sky behind it is focused onto one point. A weaker sheet, κ<sub>0</sub> &lt; 1, maps the sky onto itself shrunk by a factor 1 − κ<sub>0</sub>. It magnifies everything behind it uniformly and leaves no other trace. Unless you know how big or how bright the sources really are, you cannot tell it is there.</div>
+            <p>Where would such a sheet come from? There are two places. <b>Outside the lens</b>, galaxies and dark matter along the line of sight add a small external convergence κ<sub>ext</sub>, typically a few percent. The lens model absorbs it, which amounts to λ = 1 − κ<sub>ext</sub>, so the true <i>H</i><sub>0</sub> is (1 − κ<sub>ext</sub>) times the one the model gives. It is estimated by counting galaxies around the lens and comparing with simulations, or from weak lensing. <b>Inside the lens</b>, a sheet that goes on forever is not physical. For λ &gt; 1 it would even turn negative far out (the shaded region in the plot, which the curve reaches for λ &gt; 1.2). But any mass component that is nearly uniform across the images and fades further out does the same job where it matters. In practice it is a change in the radial density profile near θ<sub>E</sub>. Assuming a profile shape, for example a power law, quietly fixes λ.</p>
+            <p>Breaking the degeneracy takes information that does not come from lensing a single source. <b>Stellar kinematics</b> of the lens galaxy help, because σ<sub>v</sub><sup>2</sup> scales roughly with λ: the sheet changes the mass the stars feel. So do <b>sources at several redshifts</b> behind the same lens, and sources of known brightness, such as a lensed <b>type Ia supernova</b>, whose absolute magnification measures λ directly. Falco, Gorenstein &amp; Shapiro pointed out the degeneracy in 1985, for the Twin Quasar. It matters in practice: H0LiCOW measured <i>H</i><sub>0</sub> = <math><msubsup><mn>73.3</mn><mrow><mo>−</mo><mn>1.8</mn></mrow><mrow><mo>+</mo><mn>1.7</mn></mrow></msubsup></math> km/s/Mpc from six lenses, assuming standard mass profiles. When TDCOSMO (Birrer et al. 2020) dropped that assumption and let the kinematics alone constrain λ, seven lenses, six of them the same, gave <math><msubsup><mn>74.5</mn><mrow><mo>−</mo><mn>6.1</mn></mrow><mrow><mo>+</mo><mn>5.6</mn></mrow></msubsup></math>. The central value barely moved, but the uncertainty more than tripled. You can walk through the whole argument in the <a href="#cosmo">time-delay box</a>, where λ is the "Mass sheet" slider and the orange band is the kinematics.</p>
+
+            <h2 id="th-7"><span class="num">7</span>Strong, weak and micro</h2>
             <p><b>Strong lensing</b> means multiple images, arcs and rings. It happens only where κ ≳ 1, in the cores of massive galaxies and clusters. It is what the first two simulators show.</p>
             <p><b>Weak lensing</b> happens everywhere else. Each background galaxy is sheared by a percent or so, far below the natural scatter in galaxy shapes. Averaging over thousands of galaxies reveals a coherent pattern, the <b>reduced shear</b> <i>g</i> = γ/(1 − κ). From it we can map the mass of clusters (including the dark matter in the Bullet Cluster) and of the cosmic web itself ("cosmic shear", a key science goal of Euclid and the Rubin Observatory).</p>
             <p><b>Microlensing</b> is strong lensing by stars, with images far too close together to resolve. Because the lens and source move relative to each other, the total magnification changes with time. For a point lens it is:</p>
-            <div class="eq"><math display="block"><mi>A</mi><mo stretchy="false">(</mo><mi>u</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><msup><mi>u</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn></mrow><mrow><mi>u</mi><msqrt><msup><mi>u</mi><mn>2</mn></msup><mo>+</mo><mn>4</mn></msqrt></mrow></mfrac><mo>,</mo><mspace width="2em"/><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msqrt><msubsup><mi>u</mi><mn>0</mn><mn>2</mn></msubsup><mo>+</mo><msup><mrow><mo>(</mo><mfrac><mrow><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub></mrow><mrow><msub><mi>t</mi><mtext>E</mtext></msub></mrow></mfrac><mo>)</mo></mrow><mn>2</mn></msup></msqrt></math><span class="tag">(8)</span></div>
+            <div class="eq"><math display="block"><mi>A</mi><mo stretchy="false">(</mo><mi>u</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><msup><mi>u</mi><mn>2</mn></msup><mo>+</mo><mn>2</mn></mrow><mrow><mi>u</mi><msqrt><msup><mi>u</mi><mn>2</mn></msup><mo>+</mo><mn>4</mn></msqrt></mrow></mfrac><mo>,</mo><mspace width="2em"/><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msqrt><msubsup><mi>u</mi><mn>0</mn><mn>2</mn></msubsup><mo>+</mo><msup><mrow><mo>(</mo><mfrac><mrow><mi>t</mi><mo>−</mo><msub><mi>t</mi><mn>0</mn></msub></mrow><mrow><msub><mi>t</mi><mtext>E</mtext></msub></mrow></mfrac><mo>)</mo></mrow><mn>2</mn></msup></msqrt></math><span class="tag">(10)</span></div>
             <p>Here <i>u</i> = β/θ<sub>E</sub>, and <i>t</i><sub>E</sub> = θ<sub>E</sub>/μ<sub>rel</sub> is the Einstein-crossing time, typically a few weeks. This symmetric curve is the "Paczyński curve" (Paczyński 1986). A planet orbiting the lens star adds small caustics of its own. A source that crosses or passes near one of them produces a short anomaly. Microlensing is most sensitive to planets near the <b>Einstein ring</b> (a few AU), including cold, low-mass planets that other methods struggle to find.</p>
 
-            <h2><span class="num">7</span>What these simulators leave out</h2>
+            <h2 id="th-8"><span class="num">8</span>What these simulators leave out</h2>
             <ul>
                 <li>The deep field puts every background galaxy at the same redshift, the "source <i>z</i>" slider. Real galaxies sit at many redshifts and each one would see a different θ<sub>E</sub>. The few stars with diffraction spikes are in our own Milky Way. In reality they sit in front of any lens and would not be lensed at all.</li>
                 <li>The deep-field image is a finite, pixelated patch of sky. Rays that land outside it come back black.</li>
@@ -833,14 +884,14 @@
                 <li>Light is treated with geometric optics. Wave effects (relevant for gravitational waves, not for starlight) are ignored.</li>
             </ul>
         </div>
-        <div class="statusbar"><span>Reading time: about 15 minutes. Understanding time: varies.</span></div>
+        <div class="statusbar"><span>Reading time: about 20 minutes. Understanding time: varies.</span></div>
     </section>
 
     <!-- ================= famous lenses ================= -->
     <section id="famous" class="win not-embed" aria-labelledby="fam-t">
         <div class="titlebar"><span id="fam-t">Famous lenses</span><span class="path">~/lensing/hall_of_fame</span></div>
         <div class="win-body">
-            <p>A few lenses that made history. The <b>Load</b> buttons set up a simulator with a configuration of the same type. These are lookalikes, not published models.</p>
+            <p>A few lenses that made history. Three of them can be <b>loaded</b> into a simulator as a configuration of the same type. These are lookalikes, not published models.</p>
             <div class="cards" id="cards"></div>
         </div>
         <div class="statusbar"><span>Dates are discovery or publication years.</span></div>
@@ -860,7 +911,7 @@
     <section id="reading" class="win not-embed" aria-labelledby="rd-t">
         <div class="titlebar"><span id="rd-t">Further reading and watching</span><span class="path">~/lensing/refs.bib</span></div>
         <div class="win-body">
-            <div class="video" id="video"><button type="button" aria-label="Load and play the video from YouTube"><span class="play">▶</span><span>A related video on YouTube</span><span class="small" style="color:#a7a8bf">Nothing loads from YouTube until you click.</span></button></div>
+            <div class="video" id="video"><button type="button" aria-label="Load and play the video from YouTube"><span class="play">▶</span><span><b>SN Winny</b>, a video by the HOLISMOKES team</span><span class="small" style="color:#a7a8bf">Nothing loads from YouTube until you click.</span></button></div>
             <h3 style="margin-top:16px">Gentle</h3>
             <ul class="refs">
                 <li>R. Narayan &amp; M. Bartelmann, <a href="https://arxiv.org/abs/astro-ph/9606001" target="_blank" rel="noopener"><i>Lectures on Gravitational Lensing</i></a> (1996). The classic short introduction.</li>
@@ -1239,6 +1290,33 @@ function strokeSegs(ctx, segs, tx, ty) {
 }
 
 function cssVar(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+// fillText, but with subscripts written as _{...}: fillSub(ctx, 'H_{0} [km/s/Mpc]', x, y). honours textAlign
+function fillSub(ctx, text, x, y) {
+    const parts = text.split(/_\{([^}]*)\}/);   // even: normal text, odd: subscript
+    const font = ctx.font, align = ctx.textAlign, px = parseFloat(font.match(/([\d.]+)px/)[1]);
+    const small = font.replace(/[\d.]+px/, (px * 0.72).toFixed(1) + 'px');
+    const w = parts.map((p, i) => { ctx.font = i % 2 ? small : font; return ctx.measureText(p).width; });
+    const total = w.reduce((a, b) => a + b, 0);
+    let cx = align === 'center' ? x - total / 2 : align === 'right' || align === 'end' ? x - total : x;
+    ctx.textAlign = 'left';
+    parts.forEach((p, i) => { ctx.font = i % 2 ? small : font; ctx.fillText(p, cx, y + (i % 2 ? px * 0.28 : 0)); cx += w[i]; });
+    ctx.font = font; ctx.textAlign = align;
+}
+
+// where to put a w-wide label next to a marker of radius r at (X, Y) on a W×H canvas: right, left,
+// above, below, then the diagonals. takes the first spot that stays on the canvas and misses every
+// box in `placed` (other labels, other markers). returns [left edge, vertical centre]
+function placeLabel(placed, X, Y, r, w, W, H, h = 20) {
+    const R = X + r + 4, L = X - r - 4 - w, C = X - w / 2;
+    const spots = [[R, Y], [L, Y], [C, Y - r - 2 - h / 2], [C, Y + r + 2 + h / 2], [R, Y - h], [R, Y + h], [L, Y - h], [L, Y + h]];
+    const box = ([x, y]) => ({ x0: x - 3, x1: x + w + 3, y0: y - h / 2, y1: y + h / 2 });
+    const fits = s => { const b = box(s); return b.x0 >= 0 && b.x1 <= W && b.y0 >= 0 && b.y1 <= H; };
+    const free = s => { const b = box(s); return placed.every(o => b.x1 <= o.x0 || b.x0 >= o.x1 || b.y1 <= o.y0 || b.y0 >= o.y1); };
+    const s = spots.find(p => fits(p) && free(p)) || spots.find(fits) || spots[0];
+    placed.push(box(s));
+    return s;
+}
 
 /* =====================================================================
    webgl inverse ray-tracer
@@ -1624,8 +1702,8 @@ function dfReadout() {
     else {
         const th = thetaE_SIS(DF.sig, d);
         thE = thetaE_cored(th, DF.core);
-        if (DF.core > 0) label = 'Einstein radius (with core)';
-        if (DF.model === 'cluster') label = 'Einstein radius (halo alone)';
+        if (DF.core > 0) label = 'Einstein radius θ<sub>E</sub>, cored';
+        if (DF.model === 'cluster') label = 'θ<sub>E</sub> of the halo alone';
     }
     if (DF.model !== 'point') rows.push(['Scale of the lens', DF.sig < 380 ? 'a massive galaxy' : DF.sig < 750 ? 'a galaxy group' : 'a galaxy cluster']);
     if (!ok) {
@@ -1636,7 +1714,7 @@ function dfReadout() {
         rows.push([label, fmt(thE) + '″']);
         rows.push(['… at the lens', fmt(thE * PHYS.ARCSEC * d.Dd * 1000) + ' kpc']);
         rows.push(['Mass inside θ<sub>E</sub>', fmt(massInThetaE(thE, d), 2) + ' M<sub>☉</sub>']);
-        rows.push(['True deflection <span class="hat">α</span> at θ<sub>E</sub>', fmt(thE * d.Ds / d.Dds) + '″']);
+        rows.push(['Deflection <math><mover accent="true"><mi>α</mi><mo>^</mo></mover></math> at θ<sub>E</sub>', fmt(thE * d.Ds / d.Dds) + '″']);
     }
     rows.push(['<i>D</i><sub>d</sub> / <i>D</i><sub>s</sub> / <i>D</i><sub>ds</sub>', `${fmt(d.Dd / 1000)} / ${fmt(d.Ds / 1000)} / ${ok ? fmt(d.Dds / 1000) : '–'} Gpc`]);
     if (ok) rows.push(['Σ<sub>cr</sub>', fmt(sigmaCrit(d)) + ' M<sub>☉</sub>/pc²']);
@@ -2044,17 +2122,19 @@ function labRender() {
     if (LAB.show.marks) {
         ov.font = '600 15px Helvetica, Arial, sans-serif';
         ov.textBaseline = 'middle';
-        for (const im of LAB.images) {
-            const X = tx(im.x), Y = ty(im.y);
-            const r = 5 + 3 * Math.sqrt(Math.min(Math.abs(im.mu), 60));
+        const marks = LAB.images.map(im => ({ im, X: tx(im.x), Y: ty(im.y), r: 5 + 3 * Math.sqrt(Math.min(Math.abs(im.mu), 60)) }));
+        const placed = marks.map(m => ({ x0: m.X - m.r, x1: m.X + m.r, y0: m.Y - m.r, y1: m.Y + m.r }));
+        for (const { im, X, Y, r } of marks) {
             ov.strokeStyle = im.mu > 0 ? 'rgba(120, 190, 255, 0.95)' : 'rgba(255, 170, 80, 0.95)';
             ov.lineWidth = 2;
             ov.beginPath(); ov.arc(X, Y, r, 0, 2 * Math.PI); ov.stroke();
+        }
+        for (const { im, X, Y, r } of marks) {
             const txt = `${im.label}  μ=${Math.abs(im.mu) < 10 ? im.mu.toFixed(2) : im.mu.toFixed(1)}`;
             const tw = ov.measureText(txt).width;
-            const lx = X + r + 4 + tw > W ? X - r - 8 - tw : X + r + 4;
-            ov.fillStyle = 'rgba(0,0,0,0.6)'; ov.fillRect(lx - 3, Y - 10, tw + 6, 20);
-            ov.fillStyle = '#fff'; ov.fillText(txt, lx, Y);
+            const [lx, ly] = placeLabel(placed, X, Y, r, tw, W, W);
+            ov.fillStyle = 'rgba(0,0,0,0.6)'; ov.fillRect(lx - 3, ly - 10, tw + 6, 20);
+            ov.fillStyle = '#fff'; ov.fillText(txt, lx, ly);
         }
     }
 
@@ -2069,8 +2149,8 @@ function labRender() {
     sc.strokeStyle = 'rgba(255,255,255,0.12)'; sc.lineWidth = 1;
     for (let v = -1; v <= 1; v += 0.5) { sc.beginPath(); sc.moveTo(sx(v), 0); sc.lineTo(sx(v), W); sc.moveTo(0, sy(v)); sc.lineTo(W, sy(v)); sc.stroke(); }
     sc.fillStyle = 'rgba(255,255,255,0.45)'; sc.font = '14px Helvetica, Arial, sans-serif'; sc.textBaseline = 'top';
-    sc.fillText('0.5 θE', sx(0.5) + 4, sy(0) + 4);
-    sc.textAlign = 'right'; sc.fillText(`zoomed: ${LAB.SFOV} θE across`, W - 8, 8); sc.textAlign = 'left';
+    fillSub(sc, '0.5 θ_{E}', sx(0.5) + 4, sy(0) + 4);
+    sc.textAlign = 'right'; fillSub(sc, `zoomed: ${LAB.SFOV} θ_{E} across`, W - 8, 8); sc.textAlign = 'left';
     sc.imageSmoothingEnabled = true;
     sc.drawImage(labTex[LAB.src], sx(LAB.sx - size / 2), sy(LAB.sy + size / 2), size * kS, size * kS);
     if (LAB.show.caus) {
@@ -2089,7 +2169,7 @@ function labRender() {
 function labTable() {
     const imgs = LAB.images;
     const tot = imgs.reduce((s, i) => s + Math.abs(i.mu), 0);
-    let html = '<thead><tr><th>Image</th><th>Type</th><th style="text-align:right">μ</th><th style="text-align:right">Δt [days]</th><th style="text-align:right">Position</th></tr></thead><tbody>';
+    let html = '<thead><tr><th>Image</th><th>Type</th><th style="text-align:right">μ</th><th style="text-align:right">Δ<i>t</i> [days]</th><th style="text-align:right">Position</th></tr></thead><tbody>';
     for (const im of imgs) {
         html += `<tr><th><span class="swatch" style="background:${im.mu > 0 ? '#78beff' : '#ffaa50'}"></span>${im.label}</th><td>${im.type}${im.mu < 0 ? ' (mirrored)' : ''}</td><td class="v">${im.mu.toFixed(2)}</td><td class="v">${im.dt.toFixed(1)}</td><td class="v">(${fixed(im.x, 2)}, ${fixed(im.y, 2)})</td></tr>`;
     }
@@ -2211,7 +2291,7 @@ function labApply(cfg) {
 const TD = {
     FOV: 3.2, N: 560,
     cfg: 'quad', thE: 1.5, zl: 0.5, zs: 2, H0: 75, lam: 1,
-    H0true: 0, lamTrue: 1, seed: 19, revealed: false, undo: false, all: false, cont: true,
+    H0true: 0, lamTrue: 1, seed: 19, revealed: false, undo: false, zoom: false, cont: true,
     kin: false, kinErr: 0.02, kinG: 0, triedLam: false,
     lens: null, images: [], data: null, intr: null, chi: null, contours: null, offs: [],
 };
@@ -2402,15 +2482,19 @@ function tdRender() {
         }
     }
     ov.font = '600 15px Helvetica, Arial, sans-serif'; ov.textBaseline = 'middle';
+    const placed = TD.images.map(im => ({ x0: tx(im.x) - 11, x1: tx(im.x) + 11, y0: ty(im.y) - 11, y1: ty(im.y) + 11 }));
     TD.images.forEach((im, i) => {
         const X = tx(im.x), Y = ty(im.y);
         ov.strokeStyle = TD_COL[i]; ov.lineWidth = 2.5;
         ov.beginPath(); ov.arc(X, Y, 11, 0, 2 * Math.PI); ov.stroke();
+    });
+    TD.images.forEach((im, i) => {
+        const X = tx(im.x), Y = ty(im.y);
         const txt = i === 0 ? 'A  first' : `${im.label}  +${(im.dtau * T).toFixed(1)} d`;
         const tw = ov.measureText(txt).width;
-        const lx = X + 15 + tw > W ? X - 19 - tw : X + 15;
-        ov.fillStyle = 'rgba(0,0,0,0.65)'; ov.fillRect(lx - 3, Y - 10, tw + 6, 20);
-        ov.fillStyle = '#fff'; ov.fillText(txt, lx, Y);
+        const [lx, ly] = placeLabel(placed, X, Y, 11, tw, W, W);
+        ov.fillStyle = 'rgba(0,0,0,0.65)'; ov.fillRect(lx - 3, ly - 10, tw + 6, 20);
+        ov.fillStyle = '#fff'; ov.fillText(txt, lx, ly);
     });
     ov.fillStyle = 'rgba(255,255,255,0.55)'; ov.font = '13px Helvetica, Arial, sans-serif'; ov.textBaseline = 'alphabetic';
     ov.fillText(`${(TD.FOV * TD.thE).toFixed(1)}″ across`, 8, W - 10);
@@ -2429,9 +2513,9 @@ const niceStep = (span, n) => [0.01, 0.02, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 5, 1
 
 function tdLightCurves(T) {
     const cv = $('td-lc'), ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
-    const L = 74, Rm = 44, Tp = 16, B = 52;
+    const L = 80, Rm = 44, Tp = 16, B = 58;
     const st = tdAxes(ctx, W, H, L, Rm, Tp, B);
-    const x0 = -8, x1 = TD.all ? 365 * 2 + 243 : 243;
+    const x0 = -8, x1 = TD.zoom ? 243 : 365 * 2 + 243;
     const dts = TD.images.map(im => im.dtau * T);
     // points to plot
     const offAt = (i, t) => TD.offs[i][Math.min(2, Math.max(0, Math.floor(t / 365)))];
@@ -2445,7 +2529,7 @@ function tdLightCurves(T) {
     ymin -= pad; ymax += pad;
     const X = t => L + (t - x0) / (x1 - x0) * (W - L - Rm);
     const Y = m => Tp + (m - ymin) / (ymax - ymin) * (H - Tp - B);     // magnitudes: brighter is up
-    ctx.font = '20px Helvetica, Arial, sans-serif'; ctx.fillStyle = st.axis; ctx.strokeStyle = st.grid; ctx.lineWidth = 1;
+    ctx.font = '22px Helvetica, Arial, sans-serif'; ctx.fillStyle = st.axis; ctx.strokeStyle = st.grid; ctx.lineWidth = 1;
     const sy = niceStep(ymax - ymin, 6);
     ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
     for (let v = Math.ceil(ymin / sy) * sy; v <= ymax; v += sy) { ctx.beginPath(); ctx.moveTo(L, Y(v)); ctx.lineTo(W - Rm, Y(v)); ctx.stroke(); ctx.fillText(v.toFixed(sy < 0.1 ? 2 : 1), L - 8, Y(v)); }
@@ -2453,7 +2537,7 @@ function tdLightCurves(T) {
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     for (let v = Math.ceil(x0 / sx) * sx; v <= x1; v += sx) { ctx.beginPath(); ctx.moveTo(X(v), Tp); ctx.lineTo(X(v), H - B); ctx.stroke(); ctx.fillText(String(v), X(v), H - B + 6); }
     ctx.fillStyle = st.fg;
-    ctx.fillText(TD.undo ? 'days, shifted back by your predicted delays' : 'days since the start of monitoring', (L + W - Rm) / 2, H - 25);
+    ctx.fillText(TD.undo ? 'days, shifted back by your predicted delays' : 'days since the start of monitoring', (L + W - Rm) / 2, H - 27);
     ctx.save(); ctx.translate(18, (Tp + H - B) / 2); ctx.rotate(-Math.PI / 2); ctx.textBaseline = 'middle';
     ctx.fillText(TD.undo ? 'Δmag, offsets removed' : 'Δmag (curves offset)', 0, 0); ctx.restore();
     st.box();
@@ -2478,16 +2562,16 @@ function tdLightCurves(T) {
     // data
     sets.forEach((p, i) => {
         ctx.fillStyle = TD_COL[i];
-        for (const [t, m] of p) if (t >= x0 - 5 && t <= x1 + 5) { ctx.beginPath(); ctx.arc(X(t), Y(m), TD.all ? 2.6 : 3.6, 0, 2 * Math.PI); ctx.fill(); }
+        for (const [t, m] of p) if (t >= x0 - 5 && t <= x1 + 5) { ctx.beginPath(); ctx.arc(X(t), Y(m), TD.zoom ? 3.6 : 2.6, 0, 2 * Math.PI); ctx.fill(); }
     });
     ctx.restore();
     // image labels at the right edge
-    ctx.font = '600 19px Helvetica, Arial, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.font = '600 21px Helvetica, Arial, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
     if (!TD.undo) TD.images.forEach((im, i) => { ctx.fillStyle = TD_COL[i]; ctx.fillText(im.label, W - Rm + 10, clamp(Y(tdIntr(x1 - dts[i]) + offAt(i, x1) + shift[i]), Tp + 8, H - B - 8)); });
-    $('td-lc-note').textContent = TD.undo ? 'right H₀: all images fall on one curve' : (TD.all ? 'three seasons' : 'first season');
+    $('td-lc-note').innerHTML = TD.undo ? 'right <i>H</i><sub>0</sub>: all images fall on one curve' : (TD.zoom ? 'first season only' : 'three seasons');
 }
 
-const TD_PL = { L: 78, R: 18, T: 14, B: 50 };
+const TD_PL = { L: 82, R: 18, T: 14, B: 56 };
 function tdPlane() {
     const cv = $('td-plane'), ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
     const { L, R, T: Tp, B } = TD_PL;
@@ -2507,30 +2591,31 @@ function tdPlane() {
         ctx.fillStyle = `rgba(${Math.round((bl[0] * ad + or[0] * ak) / w)}, ${Math.round((bl[1] * ad + or[1] * ak) / w)}, ${Math.round((bl[2] * ad + or[2] * ak) / w)}, ${a})`;
         ctx.fillRect(px, py, cell, cell);
     }
-    ctx.font = '20px Helvetica, Arial, sans-serif'; ctx.fillStyle = st.axis; ctx.strokeStyle = st.grid; ctx.lineWidth = 1;
+    ctx.font = '22px Helvetica, Arial, sans-serif'; ctx.fillStyle = st.axis; ctx.strokeStyle = st.grid; ctx.lineWidth = 1;
     ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
     for (let l = 0.7; l <= 1.3001; l += 0.1) { ctx.beginPath(); ctx.moveTo(L, Y(l)); ctx.lineTo(W - R, Y(l)); ctx.stroke(); ctx.fillText(l.toFixed(1), L - 8, Y(l)); }
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     for (let h = 40; h <= 100; h += 10) { ctx.beginPath(); ctx.moveTo(X(h), Tp); ctx.lineTo(X(h), H - B); ctx.stroke(); ctx.fillText(String(h), X(h), H - B + 6); }
-    ctx.fillStyle = st.fg; ctx.fillText('H₀ [km/s/Mpc]', (L + W - R) / 2, H - 25);
+    ctx.fillStyle = st.fg; fillSub(ctx, 'H_{0} [km/s/Mpc]', (L + W - R) / 2, H - 27);
     ctx.save(); ctx.translate(20, (Tp + H - B) / 2); ctx.rotate(-Math.PI / 2); ctx.textBaseline = 'middle'; ctx.fillText('mass sheet λ', 0, 0); ctx.restore();
     st.box();
     ctx.save(); ctx.beginPath(); ctx.rect(L, Tp, W - L - R, H - Tp - B); ctx.clip();
     // labels on the bands
-    ctx.font = '600 18px Helvetica, Arial, sans-serif'; ctx.textBaseline = 'middle';
+    ctx.font = '600 20px Helvetica, Arial, sans-serif'; ctx.textBaseline = 'middle';
+    const dark = getComputedStyle(document.documentElement).colorScheme === 'dark';
     if (!TD.chi.open) {
         const lab = 0.76, hb = TD.chi.best * lab;
-        ctx.fillStyle = 'rgba(30, 90, 170, 0.95)'; ctx.textAlign = 'left';
+        ctx.fillStyle = dark ? 'rgba(190, 220, 255, 0.95)' : 'rgba(30, 90, 170, 0.95)'; ctx.textAlign = 'left';
         ctx.save(); ctx.translate(X(hb) + 10, Y(lab));
         ctx.rotate(-Math.atan2(Y(1.1) - Y(lab), X(TD.chi.best * 1.1) - X(hb)) * -1);
-        ctx.fillText('light curves fit here (H₀/λ fixed)', 0, 0); ctx.restore();
+        fillSub(ctx, 'light curves fit here (H_{0}/λ fixed)', 0, 0); ctx.restore();
     }
-    if (TD.kin) { ctx.fillStyle = 'rgba(190, 80, 30, 0.95)'; ctx.textAlign = 'right'; ctx.fillText('velocity dispersion fits here', W - R - 10, Y(K.lamBest) - 4); }
+    if (TD.kin) { ctx.fillStyle = dark ? 'rgba(255, 190, 150, 0.95)' : 'rgba(190, 80, 30, 0.95)'; ctx.textAlign = 'right'; ctx.fillText('velocity dispersion fits here', W - R - 10, Y(K.lamBest) - 4); }
     // truth
     if (TD.revealed) {
         ctx.fillStyle = st.fg; ctx.strokeStyle = cssVar('--well');
         star(ctx, X(TD.H0true), Y(TD.lamTrue), 12); ctx.fill(); ctx.lineWidth = 1.5; ctx.stroke();
-        ctx.textAlign = 'left'; ctx.font = '600 18px Helvetica, Arial, sans-serif'; ctx.fillText('truth', X(TD.H0true) + 14, Y(TD.lamTrue) + 14);
+        ctx.textAlign = 'left'; ctx.font = '600 20px Helvetica, Arial, sans-serif'; ctx.fillText('truth', X(TD.H0true) + 14, Y(TD.lamTrue) + 14);
     }
     // you
     const ux = X(TD.H0), uy = Y(TD.lam);
@@ -2549,9 +2634,9 @@ function tdTables(T) {
         ['Time-delay distance <i>D</i><sub>Δt</sub>', (Ddt / 1000).toFixed(3) + ' Gpc'],
         ['Einstein radius at the lens', (TD.thE * PHYS.ARCSEC * d.Dd * 1000).toFixed(2) + ' kpc'],
     ];
-    $('td-dist').innerHTML = `<thead><tr><th colspan="2">With your H₀ = ${TD.H0.toFixed(1)}</th></tr></thead><tbody>` + rows.map(r => `<tr><th>${r[0]}</th><td class="v">${r[1]}</td></tr>`).join('') + '</tbody>';
+    $('td-dist').innerHTML = `<thead><tr><th colspan="2">With your <i>H</i><sub>0</sub> = ${TD.H0.toFixed(1)}</th></tr></thead><tbody>` + rows.map(r => `<tr><th>${r[0]}</th><td class="v">${r[1]}</td></tr>`).join('') + '</tbody>';
 
-    let html = '<thead><tr><th>Image</th><th>Type</th><th style="text-align:right">μ</th><th style="text-align:right">Δt, your model</th><th style="text-align:right">Δt, true</th></tr></thead><tbody>';
+    let html = '<thead><tr><th>Image</th><th>Type</th><th style="text-align:right">μ</th><th style="text-align:right">Δ<i>t</i>, your model</th><th style="text-align:right">Δ<i>t</i>, true</th></tr></thead><tbody>';
     TD.images.forEach((im, i) => {
         html += `<tr><th><span class="swatch" style="background:${TD_COL[i]}"></span>${im.label}</th><td>${im.type}</td><td class="v">${im.mu.toFixed(2)}</td><td class="v">${(im.dtau * T).toFixed(1)} d</td><td class="v">${TD.revealed ? TD.data[i].dt.toFixed(1) + ' d' : '?'}</td></tr>`;
     });
@@ -2614,7 +2699,7 @@ function tdInit() {
         tdSliders.th.set(TD.thE); tdSliders.zl.set(TD.zl); tdSliders.zs.set(TD.zs);
         tdAll();
     });
-    for (const k of ['undo', 'all']) $('td-' + k).addEventListener('change', e => { TD[k] = e.target.checked; tdDraw(); });
+    for (const k of ['undo', 'zoom']) $('td-' + k).addEventListener('change', e => { TD[k] = e.target.checked; tdDraw(); });
     $('td-cont').addEventListener('change', e => { TD.cont = e.target.checked; tdDraw(); });
     $('td-kin').addEventListener('change', e => { TD.kin = e.target.checked; tdDraw(); });
     $('td-kerr').addEventListener('change', e => { TD.kinErr = +e.target.value; tdDraw(); });
@@ -2659,10 +2744,10 @@ function tdNewUniverse(seed) {
 }
 function tdApply(cfg) {
     const c = cfg.cfg || 'quad';
-    Object.assign(TD, { cfg: 'quad', thE: 1.5, zl: 0.5, zs: 2, H0: 75, lam: 1, undo: false, all: false, cont: true, kin: false, triedLam: false }, TD_CFG[c].set || {}, cfg);
+    Object.assign(TD, { cfg: 'quad', thE: 1.5, zl: 0.5, zs: 2, H0: 75, lam: 1, undo: false, zoom: false, cont: true, kin: false, triedLam: false }, TD_CFG[c].set || {}, cfg);
     tdSliders.h0.set(TD.H0); tdSliders.lam.set(TD.lam); tdSliders.th.set(TD.thE); tdSliders.zl.set(TD.zl); tdSliders.zs.set(TD.zs);
     tdCfgSeg(TD.cfg);
-    $('td-undo').checked = TD.undo; $('td-all').checked = TD.all; $('td-cont').checked = TD.cont; $('td-kin').checked = TD.kin;
+    $('td-undo').checked = TD.undo; $('td-zoom').checked = TD.zoom; $('td-cont').checked = TD.cont; $('td-kin').checked = TD.kin;
     TD.revealed = false;
     tdAll();
 }
@@ -2724,9 +2809,9 @@ function rayDraw() {
     const arrow = (x1, x2, y, label) => {
         ctx.strokeStyle = muted; ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke();
         for (const [x, d] of [[x1, 1], [x2, -1]]) { ctx.beginPath(); ctx.moveTo(x + 7 * d, y - 4); ctx.lineTo(x, y); ctx.lineTo(x + 7 * d, y + 4); ctx.stroke(); }
-        ctx.fillStyle = muted; ctx.fillText(label, (x1 + x2) / 2, y - 6);
+        ctx.fillStyle = muted; fillSub(ctx, label, (x1 + x2) / 2, y - 6);
     };
-    arrow(xo, xl, H - 12, 'Dd'); arrow(xl, xs, H - 34, 'Dds'); arrow(xo, xs, H - 56, 'Ds');
+    arrow(xo, xl, H - 12, 'D_{d}'); arrow(xl, xs, H - 34, 'D_{ds}'); arrow(xo, xs, H - 56, 'D_{s}');
     // straight (would-be) line to the source
     ctx.strokeStyle = muted; ctx.globalAlpha = 0.45; ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.moveTo(xo, y0); ctx.lineTo(xs, ys); ctx.stroke(); ctx.globalAlpha = 1;
@@ -2762,7 +2847,7 @@ function rayDraw() {
     for (const sgn of [1, -1]) { ctx.beginPath(); ctx.moveTo(xl - 14, y0 - sgn * thE * Dd); ctx.lineTo(xl + 14, y0 - sgn * thE * Dd); ctx.stroke(); }
     ctx.setLineDash([]);
     ctx.fillStyle = '#b8902a'; ctx.font = 'italic 15px Georgia, serif'; ctx.textAlign = 'left';
-    ctx.fillText('θE', xl + 16, y0 - thE * Dd + 5);
+    fillSub(ctx, 'θ_{E}', xl + 16, y0 - thE * Dd + 5);
 
     // readout (in units of θE)
     const u = Math.abs(beta) / thE;
@@ -2803,6 +2888,122 @@ function star(ctx, x, y, r) {
         ctx[i ? 'lineTo' : 'moveTo'](x + rr * Math.cos(a), y + rr * Math.sin(a));
     }
     ctx.closePath();
+}
+
+/* =====================================================================
+   mass-sheet transform (theory, section 6). an SIS with θ_E = 1 and its transform
+   κ → λκ + 1 − λ, cut along the line through lens and source (θ in units of θ_E)
+   ===================================================================== */
+const MST = { lam: 1.15, beta: 0.35 };
+function mstInit() {
+    slider('mst-lam', v => v.toFixed(2), v => { MST.lam = v; mstDraw(); });
+    slider('mst-b', v => v.toFixed(2) + ' θ<sub>E</sub>', v => { MST.beta = v; mstDraw(); });
+    mstDraw();
+    new MutationObserver(mstDraw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    let narrow = null;
+    new ResizeObserver(() => { const n = $('mst-canvas').clientWidth < 560; if (n !== narrow) { narrow = n; mstDraw(); } }).observe($('mst-canvas'));
+}
+function mstDraw() {
+    const cv = $('mst-canvas'), ctx = cv.getContext('2d');
+    // side by side on wide screens, stacked on phones so the labels stay readable
+    const narrow = cv.clientWidth > 0 && cv.clientWidth < 560;
+    if (cv.width !== (narrow ? 480 : 900)) { cv.width = narrow ? 480 : 900; cv.height = narrow ? 700 : 340; }
+    const W = cv.width, H = cv.height;
+    const fg = cssVar('--well-text'), axis = cssVar('--axis'), grid = cssVar('--grid'), col = cssVar('--s1'), warn = cssVar('--accent');
+    const { lam, beta } = MST;
+    ctx.fillStyle = cssVar('--well'); ctx.fillRect(0, 0, W, H);
+    ctx.lineJoin = 'round';
+
+    // a plot box [x0, x1] × [T, Bt] with grid, tick labels, an x label and a title; returns the transforms
+    const panel = ([x0, x1, T, Bt], xr, yr, xt, yt, title) => {
+        const X = v => x0 + (v - xr[0]) / (xr[1] - xr[0]) * (x1 - x0), Y = v => Bt - (v - yr[0]) / (yr[1] - yr[0]) * (Bt - T);
+        ctx.font = '15px Helvetica, Arial, sans-serif'; ctx.lineWidth = 1; ctx.strokeStyle = grid; ctx.fillStyle = axis;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+        for (const v of xt) { ctx.beginPath(); ctx.moveTo(X(v), T); ctx.lineTo(X(v), Bt); ctx.stroke(); ctx.fillText(String(v), X(v), Bt + 6); }
+        ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+        for (const v of yt) { ctx.beginPath(); ctx.moveTo(x0, Y(v)); ctx.lineTo(x1, Y(v)); ctx.stroke(); ctx.fillText(String(v), x0 - 7, Y(v)); }
+        ctx.fillStyle = fg; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; fillSub(ctx, 'θ / θ_{E}', (x0 + x1) / 2, Bt + 28);
+        ctx.font = '600 15px Helvetica, Arial, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillText(title, x0, T - 12);
+        const clip = () => { ctx.save(); ctx.beginPath(); ctx.rect(x0, T, x1 - x0, Bt - T); ctx.clip(); };
+        const frame = () => { ctx.strokeStyle = axis; ctx.lineWidth = 1; ctx.strokeRect(x0, T, x1 - x0, Bt - T); };
+        return { X, Y, T, Bt, clip, frame };
+    };
+    const boxA = narrow ? [56, 462, 34, 284] : [60, 420, 34, 284], boxB = narrow ? [56, 462, 394, 644] : [510, 880, 34, 284];
+    const curve = (P, f, a, b, color, width, dash) => {
+        ctx.strokeStyle = color; ctx.lineWidth = width; ctx.setLineDash(dash || []);
+        ctx.beginPath();
+        for (let i = 0; i <= 400; i++) { const v = a + (b - a) * i / 400; ctx[i ? 'lineTo' : 'moveTo'](P.X(v), P.Y(f(v))); }
+        ctx.stroke(); ctx.setLineDash([]);
+    };
+    const dot = (x, y, color) => { ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, 5, 0, 2 * Math.PI); ctx.fill(); };
+
+    // left: convergence (solid) and mean convergence inside θ (dashed)
+    const a = panel(boxA, [0, 3], [-0.5, 2], [0, 1, 2, 3], [-0.5, 0, 0.5, 1, 1.5, 2], 'Convergence κ, and its mean inside θ (dashed)');
+    a.clip();
+    ctx.globalAlpha = 0.1; ctx.fillStyle = warn; ctx.fillRect(a.X(0), a.Y(0), a.X(3) - a.X(0), a.Y(-0.5) - a.Y(0)); ctx.globalAlpha = 1;
+    curve(a, t => 1 / (2 * t), 0.01, 3, axis, 2);
+    curve(a, t => 1 / t, 0.01, 3, axis, 2, [7, 5]);
+    curve(a, t => lam / (2 * t) + 1 - lam, 0.01, 3, col, 3);
+    curve(a, t => lam / t + 1 - lam, 0.01, 3, col, 3, [7, 5]);
+    ctx.restore();
+    a.frame();
+    dot(a.X(1), a.Y(1), fg);
+    ctx.font = '15px Helvetica, Arial, sans-serif'; ctx.fillStyle = fg; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    fillSub(ctx, 'θ_{E}: mean κ = 1 for any λ', a.X(1) + 10, a.Y(1) - 14);
+    ctx.fillStyle = warn; ctx.textAlign = 'right'; ctx.fillText('negative density', a.X(3) - 8, a.Y(-0.25));
+
+    // right: arrival time along the axis, relative to image A
+    const tA = 1 + beta, tB = beta - 1;
+    const tau = (t, l) => 0.5 * (t - l * beta) ** 2 - l * Math.abs(t) - 0.5 * (1 - l) * t * t;
+    const rel = (t, l) => tau(t, l) - tau(tA, l);
+    let lo = Infinity, hi = -Infinity;
+    for (const l of [0.7, 1, 1.3]) for (let i = 0; i <= 200; i++) { const v = rel(-2 + 4.2 * i / 200, l); lo = Math.min(lo, v); hi = Math.max(hi, v); }
+    const pad = 0.08 * (hi - lo), step = niceStep(hi - lo, 5);
+    const yt = []; for (let v = Math.ceil((lo - pad) / step) * step; v <= hi + pad; v += step) yt.push(+v.toFixed(2));
+    const b = panel(boxB, [-2, 2.2], [lo - pad, hi + pad], [-2, -1, 0, 1, 2], yt, 'Arrival time along the lens–source line');
+    b.clip();
+    ctx.strokeStyle = fg; ctx.globalAlpha = 0.35; ctx.setLineDash([3, 4]); ctx.lineWidth = 1;
+    for (const t of [tA, tB]) { ctx.beginPath(); ctx.moveTo(b.X(t), b.T); ctx.lineTo(b.X(t), b.Bt); ctx.stroke(); }
+    ctx.beginPath(); ctx.moveTo(b.X(-2), b.Y(0)); ctx.lineTo(b.X(2.2), b.Y(0)); ctx.stroke();
+    ctx.setLineDash([]); ctx.globalAlpha = 1;
+    curve(b, t => rel(t, 1), -2, 2.2, axis, 2);
+    curve(b, t => rel(t, lam), -2, 2.2, col, 3);
+    // the delay of B, naive and transformed
+    const d1 = rel(tB, 1), dl = rel(tB, lam);
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = axis; ctx.beginPath(); ctx.moveTo(b.X(tB) - 12, b.Y(0)); ctx.lineTo(b.X(tB) - 12, b.Y(d1)); ctx.stroke();
+    ctx.strokeStyle = col; ctx.beginPath(); ctx.moveTo(b.X(tB) + 12, b.Y(0)); ctx.lineTo(b.X(tB) + 12, b.Y(dl)); ctx.stroke();
+    // the source: where each model puts it
+    for (const [x, c] of [[beta, axis], [lam * beta, col]]) {
+        ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(b.X(x), b.Bt - 12); ctx.lineTo(b.X(x) - 6, b.Bt - 1); ctx.lineTo(b.X(x) + 6, b.Bt - 1); ctx.fill();
+    }
+    ctx.restore();
+    b.frame();
+    for (const [t, y] of [[tA, 0], [tB, d1]]) dot(b.X(t), b.Y(y), axis);
+    for (const [t, y] of [[tA, 0], [tB, dl]]) dot(b.X(t), b.Y(y), col);
+    ctx.font = '600 15px Helvetica, Arial, sans-serif'; ctx.fillStyle = fg; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.fillText('A', b.X(tA), b.Y(0) - 10); ctx.fillText('B', b.X(tB), b.Y(Math.max(d1, dl)) - 10);
+    ctx.font = '15px Helvetica, Arial, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillStyle = col;
+    ctx.fillText(`Δt × ${lam.toFixed(2)}`, b.X(tB) + 20, b.Y(dl / 2));
+    ctx.textBaseline = 'bottom'; ctx.fillStyle = fg; ctx.fillText('source', b.X(Math.max(beta, lam * beta)) + 10, b.Bt - 2);
+
+    // what changes and what doesn't
+    const d = lensDistances(0.5, 2);
+    const days = (1 + 0.5) * d.Dd * d.Ds / d.Dds * PHYS.Mpc / PHYS.c * PHYS.ARCSEC ** 2 / PHYS.day;   // per unit Fermat potential at θ_E = 1″
+    const sig = C_KMS * Math.sqrt(PHYS.ARCSEC * d.Ds / (4 * Math.PI * d.Dds));
+    const muA = tA / (tA - 1), muB = tB / (tB + 1), dt = d1 * days;
+    const f2 = v => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2);
+    const rows = [
+        ['Image positions θ<sub>A</sub>, θ<sub>B</sub>', `${f2(tA)}, ${f2(tB)}`, `${f2(tA)}, ${f2(tB)}`, 'same'],
+        ['Source position β', beta.toFixed(2), (lam * beta).toFixed(2), '× λ, never observed'],
+        ['Magnifications μ<sub>A</sub>, μ<sub>B</sub>', `${muA.toFixed(2)}, ${muB.toFixed(2)}`, `${(muA / lam ** 2).toFixed(2)}, ${(muB / lam ** 2).toFixed(2)}`, '× 1/λ²'],
+        ['Flux ratio μ<sub>A</sub>/μ<sub>B</sub>', (muA / muB).toFixed(2), (muA / muB).toFixed(2), 'same'],
+        ['Time delay Δ<i>t</i><sub>AB</sub> at <i>H</i><sub>0</sub> = 70', dt.toFixed(1) + ' d', (lam * dt).toFixed(1) + ' d', '× λ'],
+        [`<i>H</i><sub>0</sub> that fits a measured ${dt.toFixed(1)} d`, '70.0', (70 * lam).toFixed(1), '× λ'],
+        ['Stellar velocity dispersion σ<sub>v</sub>', sig.toFixed(0) + ' km/s', (sig * Math.sqrt(lam)).toFixed(0) + ' km/s', '× √λ, roughly'],
+    ];
+    $('mst-res').innerHTML = '<thead><tr><th></th><th style="text-align:right">λ = 1</th><th style="text-align:right">λ = ' + lam.toFixed(2) + '</th><th>Change</th></tr></thead><tbody>'
+        + rows.map(r => `<tr><th>${r[0]}</th><td class="v">${r[1]}</td><td class="v">${r[2]}</td><td>${r[3]}</td></tr>`).join('') + '</tbody>';
 }
 
 /* =====================================================================
@@ -2869,26 +3070,20 @@ function go(id) { document.getElementById(id).scrollIntoView({ behavior: reduceM
 
 const ICONS = {
     eclipse: '<circle cx="40" cy="28" r="13" fill="#111"/><circle cx="40" cy="28" r="15" fill="none" stroke="#e9c87a" stroke-width="1.2" opacity=".7"/><circle cx="66" cy="12" r="2" fill="#9cc2f0"/><circle cx="62" cy="15" r="1.5" fill="#9cc2f0" opacity=".35"/><path d="M62 15 L66 12" stroke="#9cc2f0" stroke-width=".8"/>',
-    double: '<circle cx="40" cy="28" r="5" fill="#e9c87a"/><circle cx="18" cy="22" r="4" fill="#9cc2f0"/><circle cx="58" cy="34" r="3" fill="#9cc2f0"/>',
     cross: '<circle cx="40" cy="28" r="7" fill="#e9c87a" opacity=".85"/><circle cx="40" cy="10" r="3.2" fill="#9cc2f0"/><circle cx="40" cy="46" r="2.8" fill="#9cc2f0"/><circle cx="22" cy="28" r="2.6" fill="#9cc2f0"/><circle cx="58" cy="28" r="3" fill="#9cc2f0"/>',
     ring: '<path d="M22 32 A19 19 0 1 1 58 32" fill="none" stroke="#9cc2f0" stroke-width="4" stroke-linecap="round"/><circle cx="40" cy="26" r="5" fill="#e9c87a"/>',
     arcs: '<circle cx="40" cy="28" r="5" fill="#e9c87a"/><circle cx="30" cy="20" r="3" fill="#e9c87a" opacity=".8"/><circle cx="52" cy="33" r="3" fill="#e9c87a" opacity=".8"/><path d="M14 18 A30 26 0 0 1 36 4" fill="none" stroke="#9cc2f0" stroke-width="3" stroke-linecap="round"/><path d="M60 50 A28 24 0 0 0 70 30" fill="none" stroke="#9cc2f0" stroke-width="2.5" stroke-linecap="round"/><path d="M18 46 A26 22 0 0 0 30 52" fill="none" stroke="#9cc2f0" stroke-width="2" stroke-linecap="round"/>',
     bullet: '<ellipse cx="28" cy="28" rx="12" ry="10" fill="#4a6fd8" opacity=".55"/><ellipse cx="56" cy="28" rx="10" ry="9" fill="#4a6fd8" opacity=".55"/><ellipse cx="36" cy="29" rx="8" ry="6" fill="#e0559a" opacity=".75"/><path d="M48 29 q4 -7 10 0 q-4 6 -10 0" fill="#e0559a" opacity=".85"/>',
     planet: '<path d="M4 46 L24 45 Q34 42 38 18 Q42 42 50 44 L54 44 Q56 34 58 44 L76 46" fill="none" stroke="#9cc2f0" stroke-width="2.2"/><circle cx="56" cy="36" r="2" fill="#eb6834"/>',
-    sn: '<circle cx="40" cy="28" r="6" fill="#e9c87a"/><g fill="#fff"><circle cx="40" cy="15" r="2.6"/><circle cx="40" cy="41" r="2.2"/><circle cx="27" cy="28" r="2.4"/><circle cx="53" cy="28" r="2.4"/></g><circle cx="68" cy="10" r="2.6" fill="#fff" opacity=".5"/><path d="M64 14 l-4 4" stroke="#fff" opacity=".5"/>',
-    star: '<path d="M8 40 Q40 10 72 40" fill="none" stroke="#9cc2f0" stroke-width="5" stroke-linecap="round" opacity=".6"/><path d="M40 21 l2 5 5 .5 -4 3.5 1.2 5 -4.2 -2.8 -4.2 2.8 1.2 -5 -4 -3.5 5 -.5z" fill="#fff"/><path d="M8 25 Q40 32 72 25" stroke="#ff4646" stroke-width="1" fill="none" stroke-dasharray="3 3"/>',
 };
 
 const FAMOUS = [
-    { icon: 'eclipse', title: 'The 1919 solar eclipse', meta: 'Dyson, Eddington & Davidson (1920)', text: 'Expeditions to Sobral (Brazil) and Príncipe (off West Africa) photographed the stars around the eclipsed Sun. The stars had shifted outward by about the 1.75″ that general relativity predicts, roughly twice the Newtonian value. Later eclipses and radio measurements confirmed it, much more precisely.', btn: 'Read section 1', act: () => go('theory') },
-    { icon: 'double', title: 'The Twin Quasar, Q0957+561', meta: 'Walsh, Carswell & Weymann (1979)', text: 'The first gravitational lens ever found: two images of one quasar at <i>z</i> = 1.41, 6.1″ apart, produced by a giant elliptical galaxy (<i>z</i> = 0.36) and the cluster around it. Image B shows every flicker of image A about 417 days later (Kundić et al. 1997).', btn: 'Load in the time-delay box', act: () => { tdApply({ cfg: 'double', thE: 3.1, zl: 0.36, zs: 1.41, H0: 70 }); go('cosmo'); } },
+    { icon: 'eclipse', title: 'The 1919 solar eclipse', meta: 'Dyson, Eddington & Davidson (1920)', text: 'Expeditions to Sobral (Brazil) and Príncipe (off West Africa) photographed the stars around the eclipsed Sun. The stars had shifted outward by about the 1.75″ that general relativity predicts, roughly twice the Newtonian value. Later eclipses and radio measurements confirmed it, much more precisely.', btn: 'Read section 1', act: () => go('th-1') },
     { icon: 'cross', title: 'The Einstein Cross, Q2237+0305', meta: 'Huchra et al. (1985)', text: 'A quasar at <i>z</i> = 1.695 seen through the bulge of a nearby barred spiral galaxy at <i>z</i> = 0.039. It makes four images about 1.8″ across, in an almost perfect cross. The individual images also flicker independently as stars in the lens galaxy pass in front of them. This was the first <b>quasar microlensing</b>, seen in 1989.', btn: 'Load in the lens lab', act: () => { labApply({ model: 'sie', src: 'quasar', state: { q: 0.72, pa: 35, g: 0.02, gphi: 35, sx: 0.025, sy: 0.015, size: 0.3 } }); go('lab'); } },
     { icon: 'arcs', title: 'Giant arcs in Abell 370', meta: 'Lynds & Petrosian (1986), Soucail et al. (1987)', text: 'A strange 20″-long arc in a galaxy cluster. Some thought it might be a light echo or a shock. Spectroscopy showed it was a single background galaxy at <i>z</i> = 0.72, stretched into an arc by the cluster: the first <b>giant arc</b>. Today, clusters such as Abell 1689 are known to produce more than a hundred images of dozens of background galaxies.', btn: 'Load in the deep field', act: () => { dfApply({ model: 'cluster', state: { ...CLUSTER_DEF }, show: { crit: true }, lens: { x: 78, y: 104 }, lock: true }); go('deepfield'); } },
     { icon: 'ring', title: 'The Cosmic Horseshoe', meta: 'Belokurov et al. (2007)', text: 'A blue star-forming galaxy at <i>z</i> = 2.38 is lensed by a massive red galaxy at <i>z</i> = 0.44 into a nearly complete Einstein ring about 10″ across. The first ring, MG1131+0456, was found at radio wavelengths in 1988 (Hewitt et al.).', btn: 'Load in the lens lab', act: () => { labApply({ model: 'sie', src: 'galaxy', state: { q: 0.95, pa: 100, sx: 0.04, sy: -0.06, size: 0.42 } }); go('lab'); } },
-    { icon: 'bullet', title: 'The Bullet Cluster', meta: 'Clowe et al. (2006)', text: 'Two galaxy clusters that collided. Their hot gas, which holds most of the ordinary matter, was slowed by the collision and lags behind. Weak lensing shows that most of the <b>mass</b> passed straight through, together with the galaxies. The 8σ offset between mass and gas is some of the most direct evidence for dark matter.', btn: 'Read section 6', act: () => go('theory') },
-    { icon: 'planet', title: 'OGLE-2005-BLG-390Lb', meta: 'Beaulieu et al. (2006)', text: 'A cool planet of roughly 5.5 Earth masses, orbiting a faint red dwarf (about 0.2 M<sub>☉</sub>) at a projected distance of roughly 2.6 AU, 6.6 kpc away. It was then the lowest-mass planet known around an ordinary star. It showed up as a short extra bump on a microlensing light curve (mass ratio <i>q</i> ≈ 7.6 × 10<sup>−5</sup>, separation <i>s</i> ≈ 1.6).', btn: 'Read section 6', act: () => go('theory') },
-    { icon: 'sn', title: 'SN Refsdal', meta: 'Kelly et al. (2015)', text: 'The first multiply imaged supernova: four images in an Einstein cross around one galaxy of the cluster MACS J1149.5+2223. Lens models predicted that another image would appear about a year later elsewhere in the cluster, and it did in December 2015. Its time delay gives <i>H</i><sub>0</sub> ≈ 65–67 km/s/Mpc (Kelly et al. 2023). This was Refsdal\'s 1964 idea, finally carried out.', btn: 'Load in the lens lab', act: () => { labApply({ model: 'sie', src: 'quasar', state: { q: 0.68, pa: 120, g: 0.06, gphi: 30, sx: -0.03, sy: 0.04, size: 0.2 } }); go('lab'); } },
-    { icon: 'star', title: 'Earendel', meta: 'Welch et al. (2022)', text: 'Probably a single star (possibly a tiny star cluster; Pascale et al. 2025) at <i>z</i> ≈ 6.2, seen when the universe was under a billion years old. It sits almost exactly on the critical curve of the cluster WHL0137−08, inside the "Sunrise Arc", and is magnified by a factor of hundreds to thousands. Without lensing, nothing that small could be seen at that distance.', btn: 'Load in the lens lab', act: () => { labApply({ model: 'sie', src: 'quasar', state: { q: 0.75, pa: 0, sx: 0.0885, sy: 0.05, size: 0.04 } }); go('lab'); } },
+    { icon: 'bullet', title: 'The Bullet Cluster', meta: 'Clowe et al. (2006)', text: 'Two galaxy clusters that collided. Their hot gas, which holds most of the ordinary matter, was slowed by the collision and lags behind. Weak lensing shows that most of the <b>mass</b> passed straight through, together with the galaxies. The 8σ offset between mass and gas is some of the most direct evidence for dark matter.', btn: 'Read section 7', act: () => go('th-7') },
+    { icon: 'planet', title: 'OGLE-2005-BLG-390Lb', meta: 'Beaulieu et al. (2006)', text: 'A cool planet of roughly 5.5 Earth masses, orbiting a faint red dwarf (about 0.2 M<sub>☉</sub>) at a projected distance of roughly 2.6 AU, 6.6 kpc away. It was then the lowest-mass planet known around an ordinary star. It showed up as a short extra bump on a microlensing light curve (mass ratio <i>q</i> ≈ 7.6 × 10<sup>−5</sup>, separation <i>s</i> ≈ 1.6).', btn: 'Read section 7', act: () => go('th-7') },
 ];
 
 const EXPERIMENTS = [
@@ -2902,16 +3097,16 @@ const EXPERIMENTS = [
     { t: 'Move the source closer', p: 'With a lens in place, slide the source redshift down towards the lens redshift.', show: () => { dfApply({ model: 'sie', state: { sig: 1300, zs: 3 }, lens: { x: 92, y: 90 }, show: { crit: true }, lock: true }); go('deepfield'); }, a: 'The lensing strength depends on <i>D</i><sub>ds</sub>/<i>D</i><sub>s</sub>. It grows quickly at first and then saturates: a source at <i>z</i> = 6 is lensed only a little more strongly than one at <i>z</i> = 3. When the source is at or in front of the lens, nothing is lensed. Because each galaxy in a real deep field is at a different redshift, it sees a slightly different Einstein radius. That difference is what lets lensing measure cosmology.' },
     { t: 'Make the lens sub-critical', p: 'Increase the core radius until the arcs disappear.', show: () => { dfApply({ model: 'sie', state: { sig: 900, q: 0.9, core: 4 }, lens: { x: 92, y: 90 }, show: { crit: true }, lock: true }); go('deepfield'); }, a: 'A core spreads the central mass out. Once the convergence nowhere exceeds 1 (here, roughly when the core is larger than half the Einstein radius), there are no critical curves. Then there are no multiple images and no arcs, only mild magnification. Strong lensing needs a dense centre, so the abundance of arcs constrains how concentrated dark-matter halos are.' },
     { t: 'Read off a time delay', p: 'Put a quasar off-centre behind a round lens and read the table.', show: () => { labApply({ model: 'sie', src: 'quasar', state: { q: 1, sx: 0.3, sy: 0, size: 0.2 } }); go('lab'); }, a: 'For a singular isothermal sphere, Δ<i>t</i> = (<i>D</i><sub>Δt</sub>/2<i>c</i>)(θ<sub>A</sub>² − θ<sub>B</sub>²). Here θ<sub>A</sub> = θ<sub>E</sub> + β and θ<sub>B</sub> = θ<sub>E</sub> − β, so the delay grows linearly with β. The brighter image (the minimum) arrives first. Since <i>D</i><sub>Δt</sub> ∝ 1/<i>H</i><sub>0</sub>, a universe with a 10% larger <i>H</i><sub>0</sub> would show about 9% shorter delays (a factor 1/1.1) for the same lens.' },
-    { t: 'Measure H₀ yourself', p: 'Follow the steps under the plots: line up the light curves, discover the degeneracy, break it with kinematics, reveal.', show: () => { tdApply({}); go('cosmo'); }, a: 'A larger <i>H</i><sub>0</sub> means a smaller universe: all distances, including <i>D</i><sub>Δt</sub>, shrink as 1/<i>H</i><sub>0</sub>, and so do the predicted delays. The light curves pin down the delays very well, but delays only measure <i>H</i><sub>0</sub>/λ. Without the kinematics, a lens model with the wrong mass sheet gives a precise but wrong <i>H</i><sub>0</sub>. Real programmes (COSMOGRAIL, H0LiCOW, TDCOSMO) combine years of monitoring with lens models and stellar kinematics in exactly this way.' },
-    { t: 'The mass-sheet degeneracy', p: 'Line up the light curves, then drag the red cross along the blue band in the H₀–λ plane.', show: () => { tdApply({}); go('cosmo'); }, a: 'The transformed model κ → λκ + 1 − λ predicts exactly the same image positions and flux ratios, so the imaging cannot tell it apart from the true lens. But it predicts delays λ times longer, so the fitted <i>H</i><sub>0</sub> comes out λ times larger. Every point on the blue band fits the light curves equally well. The stellar velocity dispersion breaks the degeneracy, because σ<sub>v</sub>² scales with λ and does not depend on <i>H</i><sub>0</sub>. Even then, the kinematics are usually the largest source of error, which is why JWST spectroscopy of lens galaxies matters so much.' },
-    { t: 'Why the Einstein Cross is useless for H₀', p: 'Load the near-symmetric cross and try to fit.', show: () => { tdApply({ cfg: 'cross', H0: 70 }); go('cosmo'); }, a: 'With the source almost exactly behind the lens, all four light paths are nearly the same length, so the delays are hours, not weeks. The fit becomes hopeless and the χ² curve is almost flat. Good cosmography lenses have asymmetric image configurations and long delays. Q2237+0305 (the real Einstein Cross) has predicted delays of only hours. It is famous for microlensing instead.' },
+    { t: 'Measure <i>H</i><sub>0</sub> yourself', p: 'Follow the steps under the plots: line up the light curves, discover the degeneracy, break it with kinematics, reveal.', show: () => { tdApply({}); go('cosmo'); }, a: 'A larger <i>H</i><sub>0</sub> means a smaller universe: all distances, including <i>D</i><sub>Δt</sub>, shrink as 1/<i>H</i><sub>0</sub>, and so do the predicted delays. The light curves pin down the delays very well, but delays only measure <i>H</i><sub>0</sub>/λ. Without the kinematics, a lens model with the wrong mass sheet gives a precise but wrong <i>H</i><sub>0</sub>. Real programmes (COSMOGRAIL, H0LiCOW, TDCOSMO) combine years of monitoring with lens models and stellar kinematics in exactly this way.' },
+    { t: 'The mass-sheet degeneracy', p: 'Line up the light curves, then drag the red cross along the blue band in the <i>H</i><sub>0</sub>–λ plane.', show: () => { tdApply({}); go('cosmo'); }, a: 'The transformed model κ → λκ + 1 − λ predicts exactly the same image positions and flux ratios, so the imaging cannot tell it apart from the true lens. But it predicts delays λ times longer, so the fitted <i>H</i><sub>0</sub> comes out λ times larger. Every point on the blue band fits the light curves equally well. The stellar velocity dispersion breaks the degeneracy, because σ<sub>v</sub>² scales with λ and does not depend on <i>H</i><sub>0</sub>. Even then, the kinematics are usually the largest source of error, which is why JWST spectroscopy of lens galaxies matters so much.' },
+    { t: 'Why the Einstein Cross is useless for <i>H</i><sub>0</sub>', p: 'Load the near-symmetric cross and try to fit.', show: () => { tdApply({ cfg: 'cross', H0: 70 }); go('cosmo'); }, a: 'With the source almost exactly behind the lens, all four light paths are nearly the same length, so the delays are hours, not weeks. The fit becomes hopeless and the χ² curve is almost flat. Good cosmography lenses have asymmetric image configurations and long delays. Q2237+0305 (the real Einstein Cross) has predicted delays of only hours. It is famous for microlensing instead.' },
     { t: 'A flux-ratio anomaly', p: 'Hide a small dark-matter subhalo next to one image of an Einstein cross.', show: () => { labApply({ model: 'sie', src: 'quasar', state: { q: 0.7, pa: 30, sx: 0.05, sy: 0.03, size: 0.12, sub: true } }); go('lab'); }, a: 'Toggle the subhalo on and off and compare the μ column. The image positions barely change, by much less than 0.1 θ<sub>E</sub>, but the perturbed image\'s magnification jumps. Smooth lens models cannot reproduce such flux ratios. This is how lensing detects dark-matter clumps of 10<sup>8</sup>–10<sup>9</sup> M<sub>☉</sub>, too small to contain any stars, and so tests the nature of dark matter.' },
 ];
 
 function buildCards() {
-    $('cards').innerHTML = FAMOUS.map((f, i) => `<article class="card"><svg width="80" height="56" viewBox="0 0 80 56" aria-hidden="true" style="background:#05070f">${ICONS[f.icon]}</svg><h4>${f.title}</h4><div class="meta">${f.meta}</div><p>${f.text}</p><button class="btn small-btn" type="button" data-fam="${i}">${f.btn}</button></article>`).join('');
+    $('cards').innerHTML = FAMOUS.map((f, i) => `<article class="card"><svg viewBox="0 0 80 56" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${ICONS[f.icon]}</svg><h4>${f.title}</h4><div class="meta">${f.meta}</div><p>${f.text}</p><button class="btn small-btn" type="button" data-fam="${i}">${f.btn}</button></article>`).join('');
     document.querySelectorAll('[data-fam]').forEach(b => b.addEventListener('click', () => FAMOUS[+b.dataset.fam].act()));
-    $('exp-list').innerHTML = EXPERIMENTS.map((x, i) => `<li><div><h4>${x.t}</h4><p>${x.p}</p><button class="btn small-btn" type="button" data-exp="${i}">Show me</button><details><summary>What's going on?</summary><div>${x.a}</div></details></div></li>`).join('');
+    $('exp-list').innerHTML = EXPERIMENTS.map((x, i) => `<li><div><h4>${x.t}</h4><p>${x.p}</p><div class="go"><button class="btn small-btn" type="button" data-exp="${i}">Show me</button><details><summary>What's going on?</summary><div>${x.a}</div></details></div></div></li>`).join('');
     document.querySelectorAll('[data-exp]').forEach(b => b.addEventListener('click', () => EXPERIMENTS[+b.dataset.exp].show()));
 }
 
@@ -2927,7 +3122,7 @@ function miscInit() {
         tdDraw();
     });
     $('video').querySelector('button').addEventListener('click', () => {
-        $('video').innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/MP5gGr-ilBA?autoplay=1" title="Gravitational lensing video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+        $('video').innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/MP5gGr-ilBA?autoplay=1" title="SN Winny, by HOLISMOKES" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
     });
 
     // the title is lensed by an invisible point mass that follows the pointer
@@ -3051,12 +3246,19 @@ function bgInit() {
 
 window.addEventListener('DOMContentLoaded', () => {
     if (new URLSearchParams(location.search).has('embed')) document.body.classList.add('embed');
+    // browsers (Firefox especially) restore checkboxes, sliders and selects on reload, while the
+    // scripts below start from their own defaults. put every control back to its HTML default first
+    for (const el of document.querySelectorAll('input, select')) {
+        if (el.type === 'checkbox') el.checked = el.defaultChecked;
+        else if (el.tagName === 'SELECT') for (const o of el.options) o.selected = o.defaultSelected;
+        else el.value = el.defaultValue;
+    }
     miscInit();
     bgInit();
     buildCards();
     dfInit();
-    if (!document.body.classList.contains('embed')) { labInit(); tdInit(); rayInit(); calcInit(); }
-    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (!document.body.classList.contains('embed')) { tdDraw(); rayDraw(); } });
+    if (!document.body.classList.contains('embed')) { labInit(); tdInit(); rayInit(); mstInit(); calcInit(); }
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (!document.body.classList.contains('embed')) { tdDraw(); rayDraw(); mstDraw(); } });
 });
 </script>
 <!-- the Hubble Ultra Deep Field, inlined so the page works offline and from file:// -->

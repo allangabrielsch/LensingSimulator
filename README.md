@@ -33,7 +33,8 @@ An interactive gravitational-lensing simulator and primer. It's a single HTML fi
 **Theory**
 - From the deflection angle and the lens equation to Einstein radii, convergence and shear, caustics, the odd-number theorem, time delays and H₀, the mass-sheet degeneracy, and weak and microlensing
 - An interactive side-view ray diagram with what the observer sees, and an Einstein-radius calculator (cosmological or Galactic distances)
-- Famous lenses (1919 eclipse, Twin Quasar, Einstein Cross, Abell 370, Cosmic Horseshoe, Bullet Cluster, OGLE-2005-BLG-390Lb, SN Refsdal, Earendel), most of which load as lookalikes into the simulators
+- A section on the mass-sheet degeneracy, with a figure: drag λ and watch the convergence profile, the source position, the delays and the inferred H₀ change, while the images and flux ratios stay put
+- Famous lenses (1919 eclipse, Einstein Cross, Abell 370, Cosmic Horseshoe, Bullet Cluster, OGLE-2005-BLG-390Lb), three of which load as lookalikes into the simulators
 - Fourteen guided experiments, each with a "Show me" button and an explanation
 
 ## Accuracy
@@ -42,7 +43,7 @@ An interactive gravitational-lensing simulator and primer. It's a single HTML fi
 - Image finding agrees with the analytic SIS and point-mass solutions to better than 10⁻⁵.
 - Time-delay fits use the true intrinsic quasar light curve as a template, which real analyses do not have, so real delays are harder to measure than these. The kinematics follow the simple scaling σ_v² ∝ λ.
 - Cosmology: flat ΛCDM, H₀ = 70 km/s/Mpc, Ωm = 0.3, radiation ignored. D_A(z = 0.5) = 1259 Mpc.
-- The deep field puts every galaxy at one source redshift. Foreground stars get lensed too, which they wouldn't be in reality. Section 7 of the theory lists the other simplifications.
+- The deep field puts every galaxy at one source redshift. Foreground stars get lensed too, which they wouldn't be in reality. Section 8 of the theory lists the other simplifications.
 
 For real lens modelling, use [lenstronomy](https://github.com/lenstronomy/lenstronomy), GLEE or [Lenstool](https://projets.lam.fr/projects/lenstool).
 
