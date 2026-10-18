@@ -57,4 +57,4 @@ The stars behind the page are ray-traced too. A few invisible point masses drift
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE). The HUDF image and the math font are not covered by it. See the credits above.
+[PolyForm Noncommercial 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0). Personal, research and other noncommercial use is permitted; commercial use is not. See [LICENSE](LICENSE). The HUDF image and the math font are not covered by it. See the credits above.
