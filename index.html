@@ -20,8 +20,8 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="Gravitational Lensing">
     <meta property="og:description" content="Bend light with mass. Einstein rings, crosses, caustics and time delays that measure the Hubble constant, ray-traced live in your browser.">
-    <meta property="og:url" content="https://allangabrielsch.github.io/LensingSimulator/">
-    <meta property="og:image" content="https://allangabrielsch.github.io/LensingSimulator/og.png">
+    <meta property="og:url" content="https://simulator.lensing.science/">
+    <meta property="og:image" content="https://simulator.lensing.science/og.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="The Hubble Ultra Deep Field lensed by a simulated galaxy cluster, with giant arcs, next to the title Gravitational Lensing">
@@ -573,7 +573,7 @@
                         <button id="df-full" class="btn small-btn" type="button">Fullscreen</button>
                         <button id="df-save" class="btn small-btn" type="button">Save PNG</button>
                         <button id="df-embed" class="btn small-btn not-embed" type="button">Embed</button>
-                        <a class="embed-only small" href="https://allangabrielsch.github.io/LensingSimulator/" target="_blank" rel="noopener">More lensing toys and the theory →</a>
+                        <a class="embed-only small" href="https://simulator.lensing.science/" target="_blank" rel="noopener">More lensing toys and the theory →</a>
                     </div>
                 </div>
 
@@ -833,7 +833,7 @@
                 <div>
                     <div id="calc-warn" class="warnbox" role="status"></div>
                     <div class="table-wrap"><table class="res" id="calc-res"></table></div>
-                    <p class="note">Flat ΛCDM with <i>H</i><sub>0</sub> = 70 km/s/Mpc and Ω<sub>m</sub> = 0.3. For other cosmologies (and many more distances), see the <a href="https://allangabrielsch.github.io/CosmologyToolbox/#lensing" target="_blank" rel="noopener">Cosmology Toolbox</a>.</p>
+                    <p class="note">Flat ΛCDM with <i>H</i><sub>0</sub> = 70 km/s/Mpc and Ω<sub>m</sub> = 0.3. For other cosmologies (and many more distances), see the <a href="https://cosmology.lensing.science/#lensing" target="_blank" rel="noopener">Cosmology Toolbox</a>.</p>
                 </div>
             </div>
 
@@ -936,7 +936,7 @@
             Source code on GitHub: allangabrielsch/LensingSimulator
         </a><br>
         Made by Allan G. Schweinfurth. Deep-field image: NASA, ESA, S. Beckwith (STScI) and the HUDF Team.<br>
-        Sibling projects: <a href="https://allangabrielsch.github.io/CosmologyToolbox/" target="_blank" rel="noopener">Cosmology Toolbox</a>.<br>
+        Sibling projects: <a href="https://cosmology.lensing.science/" target="_blank" rel="noopener">Cosmology Toolbox</a>.<br>
         Runs in your browser. Nothing is sent anywhere. The photons were deflected without their consent.<br>
         The stars behind this page are lensed by a few invisible masses. One of them follows your pointer.
     </footer>
@@ -1871,7 +1871,7 @@ function dfInit() {
         const c = out.getContext('2d');
         c.drawImage($('df-gl'), 0, 0); c.drawImage($('df-ov'), 0, 0);
         c.font = '16px Helvetica, Arial, sans-serif'; c.fillStyle = 'rgba(255,255,255,0.7)'; c.textAlign = 'right';
-        c.fillText('HUDF: NASA, ESA, S. Beckwith (STScI), HUDF Team · lensing: allangabrielsch.github.io/LensingSimulator', DF.N - 10, 20);
+        c.fillText('HUDF: NASA, ESA, S. Beckwith (STScI), HUDF Team · lensing: simulator.lensing.science', DF.N - 10, 20);
         const a = document.createElement('a');
         a.download = 'lensed-deep-field.png';
         a.href = out.toDataURL('image/png');

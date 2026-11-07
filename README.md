@@ -4,7 +4,7 @@ Mass bends light. This page lets you bend it yourself.
 
 An interactive gravitational-lensing simulator and primer. It's a single HTML file with no dependencies and no build step, and it runs entirely in your browser (WebGL). Nothing gets sent anywhere.
 
-**[Open it](https://allangabrielsch.github.io/LensingSimulator/)**, or download `index.html` and double-click it. The Hubble Ultra Deep Field is baked into the page, so it works offline too.
+**[Open it](https://simulator.lensing.science/)**, or download `index.html` and double-click it. The Hubble Ultra Deep Field is baked into the page, so it works offline too.
 
 ## What's in it
 
