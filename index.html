@@ -293,6 +293,7 @@
         }
         .ctl input[type="range"] { width: 100%; }
         .ctl output { font: 12.5px var(--mono); text-align: right; white-space: nowrap; }
+        .ctl.wide-out { grid-template-columns: 8.2em minmax(0, 1fr) 7.4em; }
         .ctl.off { opacity: 0.4; }
         .ctl.off input { pointer-events: none; }
         .checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 3px 12px; }
@@ -327,6 +328,7 @@
         ol.steps li.now { color: var(--well-text); font-weight: 600; }
         ol.steps li::before { content: attr(data-mark); font-family: var(--mono); }
         .td { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 14px; align-items: start; }
+        .ctl-stack { max-width: 560px; margin: 10px auto 0; }
         .ctl-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 0 16px; margin-top: 14px; }
         @media (max-width: 860px) {
             .sim, .td { grid-template-columns: minmax(0, 1fr); }
@@ -334,6 +336,7 @@
         @media (max-width: 600px) {
             .lab { grid-template-columns: minmax(0, 1fr); }
             .ctl { grid-template-columns: 6.8em minmax(0, 1fr) 5.2em; font-size: 13px; }
+            .ctl.wide-out { grid-template-columns: 6.8em minmax(0, 1fr) 7em; }
             .win-body { padding: 12px; }
             .titlebar .path { display: none; }
         }
@@ -346,6 +349,7 @@
         table.res td.v { font: 12.5px var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; }
         #df-res th { white-space: nowrap; }
         table.res thead th { font-weight: 600; font-size: 12.5px; color: var(--muted); }
+        table.res tr.grp th { padding-top: 10px; font-weight: 600; font-size: 12px; color: var(--muted); }
         table.res tr:last-child th, table.res tr:last-child td { border-bottom: 0; }
         .swatch { display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 50%; vertical-align: -1px; }
 
@@ -856,16 +860,21 @@
             <div class="eq"><math display="block"><msub><mi>μ</mi><mi>λ</mi></msub><mo>=</mo><mfrac><mi>μ</mi><msup><mi>λ</mi><mn>2</mn></msup></mfrac><mo>,</mo><mspace width="2em"/><mi mathvariant="normal">Δ</mi><msub><mi>t</mi><mi>λ</mi></msub><mo>=</mo><mi>λ</mi><mspace width="0.1em"/><mi mathvariant="normal">Δ</mi><mi>t</mi><mo>∝</mo><mfrac><mi>λ</mi><msub><mi>H</mi><mn>0</mn></msub></mfrac></math><span class="tag">(9)</span></div>
             <p>A measured delay therefore only fixes <i>H</i><sub>0</sub>/λ. If the true lens has λ = 0.9 and you model it with λ = 1, your <i>H</i><sub>0</sub> comes out 10% too high, and nothing in the data warns you. Move λ below: the image positions and the flux ratio stay put, while the source, the delay and the inferred <i>H</i><sub>0</sub> all move.</p>
             <div class="figure">
-                <div class="well"><canvas id="mst-canvas" width="900" height="340" style="display:block;width:100%;height:auto" role="img" aria-label="Left: the convergence profile of an isothermal lens and of its mass-sheet transform. Right: their arrival-time curves along the line through lens and source, with the same image positions but different delays."></canvas></div>
-                <div class="ctl-cols" style="margin-top:10px">
-                    <label class="ctl"><span>Mass sheet λ</span><input id="mst-lam" type="range" min="0.7" max="1.3" step="0.01" value="1.15"><output id="mst-lam-o"></output></label>
-                    <label class="ctl"><span>Source β</span><input id="mst-b" type="range" min="0.05" max="0.9" step="0.01" value="0.35"><output id="mst-b-o"></output></label>
+                <div class="well"><canvas id="mst-canvas" width="900" height="620" style="display:block;width:100%;height:auto" role="img" aria-label="Two lenses side by side. The lensed pictures of a quasar are identical, but the light curves below show image B lagging image A by a different number of days, so the same measured delay gives two different values of the Hubble constant."></canvas></div>
+                <div class="cap"><span><b>Two different lenses, one picture.</b> Drag λ: the pictures never change, the delay does, and so does <i>H</i><sub>0</sub>.</span></div>
+                <div class="ctl-stack">
+                    <label class="ctl wide-out"><span>Mass sheet λ</span><input id="mst-lam" type="range" min="0.7" max="1.3" step="0.01" value="1.15"><output id="mst-lam-o"></output></label>
+                    <label class="ctl wide-out"><span>Source β</span><input id="mst-b" type="range" min="0.15" max="0.9" step="0.01" value="0.35"><output id="mst-b-o"></output></label>
                 </div>
+                <details id="mst-more"><summary>What is different about the two lenses?</summary><div>
+                    <p style="margin:0 0 8px">Lens 2 is lens 1 with its mass scaled by λ, plus a uniform sheet of convergence 1 − λ across the whole sky (negative when λ &gt; 1). Inside the Einstein radius both hold exactly the same mass, which is why their pictures agree. Solid lines: the convergence κ at each radius. Dashed: the mean κ inside that radius.</p>
+                    <canvas id="mst-kappa" width="600" height="360" style="display:block;width:100%;height:auto" role="img" aria-label="Convergence profiles of the two lenses: they differ everywhere except that the mean convergence inside the Einstein radius is 1 for both."></canvas>
+                </div></details>
                 <div class="table-wrap" style="margin-top:8px"><table class="res" id="mst-res"></table></div>
-                <p class="small">Grey: a singular isothermal sphere with θ<sub>E</sub> = 1″ at <i>z</i><sub>lens</sub> = 0.5, <i>z</i><sub>source</sub> = 2, with the source at β. Blue: its mass-sheet transform. The mean convergence inside θ<sub>E</sub> is 1 for every λ, so the Einstein radius never changes. Both arrival-time curves are stationary at the same two image positions, A and B, but B arrives λ times later.</p>
+                <p class="small">Both lenses: a singular isothermal sphere with θ<sub>E</sub> = 1″ at <i>z</i><sub>lens</sub> = 0.5, <i>z</i><sub>source</sub> = 2, lensing a quasar in its host galaxy. Lens 2 is its mass-sheet transform, and puts the source at λβ, λ times smaller.</p>
             </div>
             <div class="aside"><b>A lens that hides itself</b>A uniform sheet with κ = 1, on its own, is a perfect lens. It deflects every ray by exactly α = θ, so the whole sky behind it is focused onto one point. A weaker sheet, κ<sub>0</sub> &lt; 1, maps the sky onto itself shrunk by a factor 1 − κ<sub>0</sub>. It magnifies everything behind it uniformly and leaves no other trace. Unless you know how big or how bright the sources really are, you cannot tell it is there.</div>
-            <p>Where would such a sheet come from? There are two places. <b>Outside the lens</b>, galaxies and dark matter along the line of sight add a small external convergence κ<sub>ext</sub>, typically a few percent. The lens model absorbs it, which amounts to λ = 1 − κ<sub>ext</sub>, so the true <i>H</i><sub>0</sub> is (1 − κ<sub>ext</sub>) times the one the model gives. It is estimated by counting galaxies around the lens and comparing with simulations, or from weak lensing. <b>Inside the lens</b>, a sheet that goes on forever is not physical. For λ &gt; 1 it would even turn negative far out (the shaded region in the plot, which the curve reaches for λ &gt; 1.2). But any mass component that is nearly uniform across the images and fades further out does the same job where it matters. In practice it is a change in the radial density profile near θ<sub>E</sub>. Assuming a profile shape, for example a power law, quietly fixes λ.</p>
+            <p>Where would such a sheet come from? There are two places. <b>Outside the lens</b>, galaxies and dark matter along the line of sight add a small external convergence κ<sub>ext</sub>, typically a few percent. The lens model absorbs it, which amounts to λ = 1 − κ<sub>ext</sub>, so the true <i>H</i><sub>0</sub> is (1 − κ<sub>ext</sub>) times the one the model gives. It is estimated by counting galaxies around the lens and comparing with simulations, or from weak lensing. <b>Inside the lens</b>, a sheet that goes on forever is not physical. For λ &gt; 1 it would even turn negative far out (the shaded region in the mass-profile plot, which the curve reaches for λ &gt; 1.2). But any mass component that is nearly uniform across the images and fades further out does the same job where it matters. In practice it is a change in the radial density profile near θ<sub>E</sub>. Assuming a profile shape, for example a power law, quietly fixes λ.</p>
             <p>Breaking the degeneracy takes information that does not come from lensing a single source. <b>Stellar kinematics</b> of the lens galaxy help, because σ<sub>v</sub><sup>2</sup> scales roughly with λ: the sheet changes the mass the stars feel. So do <b>sources at several redshifts</b> behind the same lens, and sources of known brightness, such as a lensed <b>type Ia supernova</b>, whose absolute magnification measures λ directly. Falco, Gorenstein &amp; Shapiro pointed out the degeneracy in 1985, for the Twin Quasar. It matters in practice: H0LiCOW measured <i>H</i><sub>0</sub> = <math><msubsup><mn>73.3</mn><mrow><mo>−</mo><mn>1.8</mn></mrow><mrow><mo>+</mo><mn>1.7</mn></mrow></msubsup></math> km/s/Mpc from six lenses, assuming standard mass profiles. When TDCOSMO (Birrer et al. 2020) dropped that assumption and let the kinematics alone constrain λ, seven lenses, six of them the same, gave <math><msubsup><mn>74.5</mn><mrow><mo>−</mo><mn>6.1</mn></mrow><mrow><mo>+</mo><mn>5.6</mn></mrow></msubsup></math>. The central value barely moved, but the uncertainty more than tripled. You can walk through the whole argument in the <a href="#cosmo">time-delay box</a>, where λ is the "Mass sheet" slider and the orange band is the kinematics.</p>
 
             <h2 id="th-7"><span class="num">7</span>Strong, weak and micro</h2>
@@ -2595,7 +2604,8 @@ function tdPlane() {
     for (let py = Tp; py < H - B; py += cell) for (let px = L; px < W - R; px += cell) {
         const h = 40 + (px + cell / 2 - L) / (W - L - R) * 60, l = 0.7 + (H - B - py - cell / 2) / (H - Tp - B) * 0.6;
         const { cd, ck } = tdChiPlane(h, l, K);
-        const ad = cd < 1 ? 0.42 : cd < 4 ? 0.18 : 0, ak = TD.kin ? (ck < 1 ? 0.38 : ck < 4 ? 0.16 : 0) : 0;
+        // no light-curve constraint: leave the plane empty instead of shading all of it
+        const ad = TD.chi.open ? 0 : cd < 1 ? 0.42 : cd < 4 ? 0.18 : 0, ak = TD.kin ? (ck < 1 ? 0.38 : ck < 4 ? 0.16 : 0) : 0;
         if (!ad && !ak) continue;
         const a = 1 - (1 - ad) * (1 - ak);
         const w = ad + ak;
@@ -2620,6 +2630,9 @@ function tdPlane() {
         ctx.save(); ctx.translate(X(hb) + 10, Y(lab));
         ctx.rotate(-Math.atan2(Y(1.1) - Y(lab), X(TD.chi.best * 1.1) - X(hb)) * -1);
         fillSub(ctx, 'light curves fit here (H_{0}/λ fixed)', 0, 0); ctx.restore();
+    } else {
+        ctx.fillStyle = dark ? 'rgba(190, 220, 255, 0.6)' : 'rgba(30, 90, 170, 0.6)'; ctx.textAlign = 'center';
+        ctx.fillText('light curves: no constraint', (L + W - R) / 2, (Tp + H - B) / 2 + 40);
     }
     if (TD.kin) { ctx.fillStyle = dark ? 'rgba(255, 190, 150, 0.95)' : 'rgba(190, 80, 30, 0.95)'; ctx.textAlign = 'right'; ctx.fillText('velocity dispersion fits here', W - R - 10, Y(K.lamBest) - 4); }
     // truth
@@ -2907,114 +2920,222 @@ function star(ctx, x, y, r) {
    ===================================================================== */
 const MST = { lam: 1.15, beta: 0.35 };
 function mstInit() {
-    slider('mst-lam', v => v.toFixed(2), v => { MST.lam = v; mstDraw(); });
-    slider('mst-b', v => v.toFixed(2) + ' θ<sub>E</sub>', v => { MST.beta = v; mstDraw(); });
+    // the source is not a free parameter of lens 2: it sits at λβ. show both, so it visibly moves with λ
+    const sb = slider('mst-b', v => `${v.toFixed(2)} → ${(MST.lam * v).toFixed(2)}`, v => { MST.beta = v; mstDraw(); });
+    slider('mst-lam', v => v.toFixed(2), v => { MST.lam = v; sb.show(); mstDraw(); });
     mstDraw();
     new MutationObserver(mstDraw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     let narrow = null;
     new ResizeObserver(() => { const n = $('mst-canvas').clientWidth < 560; if (n !== narrow) { narrow = n; mstDraw(); } }).observe($('mst-canvas'));
+    $('mst-more').addEventListener('toggle', mstDraw);
 }
+// arrival time along the lens–source axis (θ in units of θ_E) for the SIS and its mass-sheet transform
+const mstTau = (t, l, beta) => 0.5 * (t - l * beta) ** 2 - l * Math.abs(t) - 0.5 * (1 - l) * t * t;
+
+// the lensed picture: a quasar in its host galaxy behind the SIS + sheet. ray-trace θ → β = θ − α(θ) with
+// α = λ θ/|θ| + (1 − λ) θ, so β = λ (θ − θ/|θ|). lens 2 puts the source at λβ and makes it λ times smaller,
+// so β/λ is all that matters and the picture does not depend on λ at all. that is the degeneracy
+let mstPic = null, mstPicKey = '';
+const MST_FOV = 1.95;   // half-width of the pictures, in θ_E
+function mstPicture(beta) {
+    const n = 220, key = beta.toFixed(3);
+    if (mstPic && mstPicKey === key) return mstPic;
+    const c = mstPic || document.createElement('canvas');
+    c.width = c.height = n;
+    const g = c.getContext('2d'), img = g.createImageData(n, n), D = img.data;
+    const R = MST_FOV, px = 2 * R / n;
+    for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+        const x = -R + (i + 0.5) * px, y = R - (j + 0.5) * px, r = Math.hypot(x, y) + 1e-9;
+        const ux = x - x / r - beta, uy = y - y / r;                       // source plane, in units of the source
+        const host = Math.exp(-0.5 * (ux * ux / 0.04 + uy * uy / 0.0144));
+        const qso = 2.5 * Math.exp(-0.5 * (ux * ux + uy * uy) / 0.0009);
+        const gal = 0.9 * Math.exp(-r / 0.16);                            // the lens galaxy's own light
+        const k = 4 * (j * n + i);
+        D[k] = Math.min(255, 6 + 110 * host + 255 * qso + 255 * gal);
+        D[k + 1] = Math.min(255, 9 + 145 * host + 250 * qso + 212 * gal);
+        D[k + 2] = Math.min(255, 20 + 255 * host + 255 * qso + 150 * gal);
+        D[k + 3] = 255;
+    }
+    g.putImageData(img, 0, 0);
+    mstPic = c; mstPicKey = key;
+    return c;
+}
+
 function mstDraw() {
     const cv = $('mst-canvas'), ctx = cv.getContext('2d');
-    // side by side on wide screens, stacked on phones so the labels stay readable
+    // side by side on wide screens; on phones the light curves and the H0 line stack
     const narrow = cv.clientWidth > 0 && cv.clientWidth < 560;
-    if (cv.width !== (narrow ? 480 : 900)) { cv.width = narrow ? 480 : 900; cv.height = narrow ? 700 : 340; }
-    const W = cv.width, H = cv.height;
-    const fg = cssVar('--well-text'), axis = cssVar('--axis'), grid = cssVar('--grid'), col = cssVar('--s1'), warn = cssVar('--accent');
+    const W = narrow ? 480 : 900, H = narrow ? 760 : 620;
+    if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+    const fg = cssVar('--well-text'), axis = cssVar('--axis'), grid = cssVar('--grid'), col = cssVar('--s1');
+    const cA = cssVar('--s3'), cB = cssVar('--s2');
     const { lam, beta } = MST;
+    const font = (bold, s) => { ctx.font = `${bold ? '600 ' : ''}${s}px Helvetica, Arial, sans-serif`; };
     ctx.fillStyle = cssVar('--well'); ctx.fillRect(0, 0, W, H);
     ctx.lineJoin = 'round';
 
-    // a plot box [x0, x1] × [T, Bt] with grid, tick labels, an x label and a title; returns the transforms
-    const panel = ([x0, x1, T, Bt], xr, yr, xt, yt, title) => {
-        const X = v => x0 + (v - xr[0]) / (xr[1] - xr[0]) * (x1 - x0), Y = v => Bt - (v - yr[0]) / (yr[1] - yr[0]) * (Bt - T);
-        ctx.font = '15px Helvetica, Arial, sans-serif'; ctx.lineWidth = 1; ctx.strokeStyle = grid; ctx.fillStyle = axis;
-        ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-        for (const v of xt) { ctx.beginPath(); ctx.moveTo(X(v), T); ctx.lineTo(X(v), Bt); ctx.stroke(); ctx.fillText(String(v), X(v), Bt + 6); }
-        ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-        for (const v of yt) { ctx.beginPath(); ctx.moveTo(x0, Y(v)); ctx.lineTo(x1, Y(v)); ctx.stroke(); ctx.fillText(String(v), x0 - 7, Y(v)); }
-        ctx.fillStyle = fg; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; fillSub(ctx, 'θ / θ_{E}', (x0 + x1) / 2, Bt + 28);
-        ctx.font = '600 15px Helvetica, Arial, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillText(title, x0, T - 12);
-        const clip = () => { ctx.save(); ctx.beginPath(); ctx.rect(x0, T, x1 - x0, Bt - T); ctx.clip(); };
-        const frame = () => { ctx.strokeStyle = axis; ctx.lineWidth = 1; ctx.strokeRect(x0, T, x1 - x0, Bt - T); };
-        return { X, Y, T, Bt, clip, frame };
-    };
-    const boxA = narrow ? [56, 462, 34, 284] : [60, 420, 34, 284], boxB = narrow ? [56, 462, 394, 644] : [510, 880, 34, 284];
-    const curve = (P, f, a, b, color, width, dash) => {
-        ctx.strokeStyle = color; ctx.lineWidth = width; ctx.setLineDash(dash || []);
-        ctx.beginPath();
-        for (let i = 0; i <= 400; i++) { const v = a + (b - a) * i / 400; ctx[i ? 'lineTo' : 'moveTo'](P.X(v), P.Y(f(v))); }
-        ctx.stroke(); ctx.setLineDash([]);
-    };
-    const dot = (x, y, color) => { ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x, y, 5, 0, 2 * Math.PI); ctx.fill(); };
-
-    // left: convergence (solid) and mean convergence inside θ (dashed)
-    const a = panel(boxA, [0, 3], [-0.5, 2], [0, 1, 2, 3], [-0.5, 0, 0.5, 1, 1.5, 2], 'Convergence κ, and its mean inside θ (dashed)');
-    a.clip();
-    ctx.globalAlpha = 0.1; ctx.fillStyle = warn; ctx.fillRect(a.X(0), a.Y(0), a.X(3) - a.X(0), a.Y(-0.5) - a.Y(0)); ctx.globalAlpha = 1;
-    curve(a, t => 1 / (2 * t), 0.01, 3, axis, 2);
-    curve(a, t => 1 / t, 0.01, 3, axis, 2, [7, 5]);
-    curve(a, t => lam / (2 * t) + 1 - lam, 0.01, 3, col, 3);
-    curve(a, t => lam / t + 1 - lam, 0.01, 3, col, 3, [7, 5]);
-    ctx.restore();
-    a.frame();
-    dot(a.X(1), a.Y(1), fg);
-    ctx.font = '15px Helvetica, Arial, sans-serif'; ctx.fillStyle = fg; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-    fillSub(ctx, 'θ_{E}: mean κ = 1 for any λ', a.X(1) + 10, a.Y(1) - 14);
-    ctx.fillStyle = warn; ctx.textAlign = 'right'; ctx.fillText('negative density', a.X(3) - 8, a.Y(-0.25));
-
-    // right: arrival time along the axis, relative to image A
+    // the physics: image positions, the delay of B (days at H0 = 70), and the H0 each lens needs
     const tA = 1 + beta, tB = beta - 1;
-    const tau = (t, l) => 0.5 * (t - l * beta) ** 2 - l * Math.abs(t) - 0.5 * (1 - l) * t * t;
-    const rel = (t, l) => tau(t, l) - tau(tA, l);
-    let lo = Infinity, hi = -Infinity;
-    for (const l of [0.7, 1, 1.3]) for (let i = 0; i <= 200; i++) { const v = rel(-2 + 4.2 * i / 200, l); lo = Math.min(lo, v); hi = Math.max(hi, v); }
-    const pad = 0.08 * (hi - lo), step = niceStep(hi - lo, 5);
-    const yt = []; for (let v = Math.ceil((lo - pad) / step) * step; v <= hi + pad; v += step) yt.push(+v.toFixed(2));
-    const b = panel(boxB, [-2, 2.2], [lo - pad, hi + pad], [-2, -1, 0, 1, 2], yt, 'Arrival time along the lens–source line');
-    b.clip();
-    ctx.strokeStyle = fg; ctx.globalAlpha = 0.35; ctx.setLineDash([3, 4]); ctx.lineWidth = 1;
-    for (const t of [tA, tB]) { ctx.beginPath(); ctx.moveTo(b.X(t), b.T); ctx.lineTo(b.X(t), b.Bt); ctx.stroke(); }
-    ctx.beginPath(); ctx.moveTo(b.X(-2), b.Y(0)); ctx.lineTo(b.X(2.2), b.Y(0)); ctx.stroke();
-    ctx.setLineDash([]); ctx.globalAlpha = 1;
-    curve(b, t => rel(t, 1), -2, 2.2, axis, 2);
-    curve(b, t => rel(t, lam), -2, 2.2, col, 3);
-    // the delay of B, naive and transformed
-    const d1 = rel(tB, 1), dl = rel(tB, lam);
-    ctx.lineWidth = 2.5;
-    ctx.strokeStyle = axis; ctx.beginPath(); ctx.moveTo(b.X(tB) - 12, b.Y(0)); ctx.lineTo(b.X(tB) - 12, b.Y(d1)); ctx.stroke();
-    ctx.strokeStyle = col; ctx.beginPath(); ctx.moveTo(b.X(tB) + 12, b.Y(0)); ctx.lineTo(b.X(tB) + 12, b.Y(dl)); ctx.stroke();
-    // the source: where each model puts it
-    for (const [x, c] of [[beta, axis], [lam * beta, col]]) {
-        ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(b.X(x), b.Bt - 12); ctx.lineTo(b.X(x) - 6, b.Bt - 1); ctx.lineTo(b.X(x) + 6, b.Bt - 1); ctx.fill();
-    }
-    ctx.restore();
-    b.frame();
-    for (const [t, y] of [[tA, 0], [tB, d1]]) dot(b.X(t), b.Y(y), axis);
-    for (const [t, y] of [[tA, 0], [tB, dl]]) dot(b.X(t), b.Y(y), col);
-    ctx.font = '600 15px Helvetica, Arial, sans-serif'; ctx.fillStyle = fg; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-    ctx.fillText('A', b.X(tA), b.Y(0) - 10); ctx.fillText('B', b.X(tB), b.Y(Math.max(d1, dl)) - 10);
-    ctx.font = '15px Helvetica, Arial, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillStyle = col;
-    ctx.fillText(`Δt × ${lam.toFixed(2)}`, b.X(tB) + 20, b.Y(dl / 2));
-    ctx.textBaseline = 'bottom'; ctx.fillStyle = fg; ctx.fillText('source', b.X(Math.max(beta, lam * beta)) + 10, b.Bt - 2);
-
-    // what changes and what doesn't
     const d = lensDistances(0.5, 2);
     const days = (1 + 0.5) * d.Dd * d.Ds / d.Dds * PHYS.Mpc / PHYS.c * PHYS.ARCSEC ** 2 / PHYS.day;   // per unit Fermat potential at θ_E = 1″
+    const d1 = mstTau(tB, 1, beta) - mstTau(tA, 1, beta);
+    const dt = [d1 * days, lam * d1 * days];
+
+    // 1. the two pictures
+    const S = narrow ? 190 : 210, top = 34, cx = [W / 4, 3 * W / 4], cy = top + S / 2;
+    const pic = mstPicture(beta);
+    font(1, 15); ctx.fillStyle = fg; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('Lens 1: no sheet (λ = 1)', cx[0], 22);
+    ctx.fillText(`Lens 2: with a sheet (λ = ${lam.toFixed(2)})`, cx[1], 22);
+    for (let k = 0; k < 2; k++) {
+        const x0 = cx[k] - S / 2, X = t => x0 + (t + MST_FOV) / (2 * MST_FOV) * S, sc = S / (2 * MST_FOV);
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(pic, x0, top, S, S);
+        ctx.strokeStyle = axis; ctx.lineWidth = 1; ctx.strokeRect(x0, top, S, S);
+        font(1, 14); ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle';
+        ctx.fillText('A', X(tA), cy - 0.5 * sc); ctx.fillText('B', X(tB), cy - 0.5 * sc);
+        // where this lens says the source is. nobody can see it, so it is only a dashed outline
+        const l = k ? lam : 1, sx = X(l * beta), r = l * 0.32 * sc;
+        ctx.save(); ctx.beginPath(); ctx.rect(x0, top, S, S); ctx.clip();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)'; ctx.setLineDash([3, 3]);
+        ctx.beginPath(); ctx.arc(sx, cy, r, 0, 2 * Math.PI); ctx.stroke(); ctx.setLineDash([]);
+        ctx.restore();
+    }
+    font(0, 12); ctx.fillStyle = axis; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.fillText('dashed circle: where each lens puts the source (never seen)', W / 2, top + S + 8);
+    font(1, 34); ctx.fillStyle = fg; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('=', W / 2, cy - 8);
+    font(0, 13); ctx.fillStyle = axis; ctx.fillText('same', W / 2, cy + 20); ctx.fillText('picture', W / 2, cy + 36);
+
+    // 2. the light curves: the quasar flickers, B shows the same flicker later
+    const f = t => 0.45 * Math.sin(2 * Math.PI * t / 170 + 0.3) + 0.3 * Math.sin(2 * Math.PI * t / 71 + 1.9) + 0.16 * Math.sin(2 * Math.PI * t / 37 + 4.1);
+    let tp = 40; for (let t = 40; t <= 140; t += 0.5) if (f(t) > f(tp)) tp = t;
+    const T1 = 400, lcTop = top + S + 50, lcH = 120;
+    const boxes = narrow ? [[34, W - 14, lcTop], [34, W - 14, lcTop + lcH + 64]] : [[cx[0] - 200, cx[0] + 200, lcTop], [cx[1] - 200, cx[1] + 200, lcTop]];
+    boxes.forEach(([x0, x1, y0], k) => {
+        const X = t => x0 + t / T1 * (x1 - x0), Y = v => y0 + (2.05 - v) / 4.5 * lcH;
+        font(0, 13); ctx.fillStyle = axis; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+        fillSub(ctx, `Lens ${k + 1}: brightness of A and B (at H_{0} = 70)`, x0, y0 - 8);
+        ctx.strokeStyle = grid; ctx.lineWidth = 1;
+        for (let t = 0; t <= T1; t += 100) { ctx.beginPath(); ctx.moveTo(X(t), y0); ctx.lineTo(X(t), y0 + lcH); ctx.stroke(); }
+        ctx.strokeStyle = axis; ctx.strokeRect(x0, y0, x1 - x0, lcH);
+        font(0, 12); ctx.fillStyle = axis; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+        for (let t = 0; t <= T1; t += 100) ctx.fillText(t === T1 ? 'days' : String(t), X(t), y0 + lcH + 4);
+        ctx.save(); ctx.beginPath(); ctx.rect(x0, y0, x1 - x0, lcH); ctx.clip();
+        for (const [off, lag, c] of [[1, 0, cA], [-1, dt[k], cB]]) {
+            ctx.strokeStyle = c; ctx.lineWidth = 2.2; ctx.beginPath();
+            for (let t = 0; t <= T1; t += 2) ctx[t ? 'lineTo' : 'moveTo'](X(t), Y(f(t - lag) + off));
+            ctx.stroke();
+        }
+        // the same peak in A and in B, and the lag between them
+        const pa = tp, pb = tp + dt[k];
+        ctx.strokeStyle = fg; ctx.globalAlpha = 0.5; ctx.setLineDash([3, 3]);
+        for (const [t, v] of [[pa, f(tp) + 1], [pb, f(tp) - 1]]) { ctx.beginPath(); ctx.moveTo(X(t), Y(v)); ctx.lineTo(X(t), Y(-2.15)); ctx.stroke(); }
+        ctx.setLineDash([]); ctx.globalAlpha = 1;
+        const ya = Y(-2.15);
+        ctx.strokeStyle = fg; ctx.fillStyle = fg; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(X(pa), ya); ctx.lineTo(X(pb), ya); ctx.stroke();
+        for (const [x, s] of [[X(pa), 1], [X(pb), -1]]) { ctx.beginPath(); ctx.moveTo(x, ya); ctx.lineTo(x + 7 * s, ya - 4); ctx.lineTo(x + 7 * s, ya + 4); ctx.fill(); }
+        font(1, 13); ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText(`B lags ${dt[k].toFixed(0)} d`, X(pb) + 8, ya);
+        font(1, 13); ctx.fillStyle = cA; ctx.fillText('A', x0 + 6, Y(1.6)); ctx.fillStyle = cB; ctx.fillText('B', x0 + 6, Y(-0.15));
+        ctx.restore();
+    });
+
+    // 3. turn it around: you measured lens 1's delay. which H0 does each lens need for it?
+    const hTop = narrow ? lcTop + 2 * lcH + 64 + 52 : lcTop + lcH + 62, L = narrow ? 34 : 60, R = W - (narrow ? 14 : 60);
+    const hx = h => L + (h - 45) / 50 * (R - L), y0 = hTop + 46;
+    const h1 = 70, h2 = 70 * lam;
+    font(1, 15); ctx.fillStyle = fg; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    fillSub(ctx, `You measure B ${dt[0].toFixed(0)} days behind A. Which H_{0} does that give?`, L, hTop);
+    ctx.strokeStyle = axis; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(L, y0); ctx.lineTo(R, y0); ctx.stroke();
+    font(0, 12); ctx.fillStyle = axis; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    for (let h = 45; h <= 95; h += 5) { ctx.beginPath(); ctx.moveTo(hx(h), y0 - 4); ctx.lineTo(hx(h), y0 + 4); ctx.stroke(); if (h % 10 === 5 || !narrow) ctx.fillText(String(h), hx(h), y0 + 8); }
+    ctx.textAlign = 'right'; ctx.fillText('km/s/Mpc', R, y0 + 26);
+    // the two sides of the Hubble tension, for scale
+    for (const [h, name, al] of [[67.4, 'Planck', 'right'], [73.0, 'SH0ES', 'left']]) {
+        ctx.strokeStyle = axis; ctx.beginPath(); ctx.moveTo(hx(h), y0); ctx.lineTo(hx(h), y0 + 36); ctx.stroke();
+        ctx.textAlign = al; ctx.fillText(name, hx(h) + (al === 'left' ? 4 : -4), y0 + 26);
+    }
+    // lens 1 and lens 2, labels on the outer side of each dot
+    const same = Math.abs(h2 - h1) < 0.05, right2 = h2 >= h1;
+    for (const [h, c, txt, al] of [[h1, axis, `lens 1: ${h1.toFixed(1)}`, right2 ? 'right' : 'left'], [h2, col, `lens 2: ${h2.toFixed(1)}`, right2 ? 'left' : 'right']]) {
+        ctx.fillStyle = c; ctx.beginPath(); ctx.arc(hx(clamp(h, 45, 95)), y0, 6, 0, 2 * Math.PI); ctx.fill();
+        if (same) continue;
+        font(1, 13); ctx.textAlign = al; ctx.textBaseline = 'bottom';
+        ctx.fillText(txt, hx(clamp(h, 45, 95)) + (al === 'left' ? 4 : -4), y0 - 10);
+    }
+    if (same) { font(1, 13); ctx.fillStyle = fg; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText('both lenses: 70.0', hx(70), y0 - 10); }
+    else {
+        font(0, 13); ctx.fillStyle = fg; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+        ctx.fillText(`Same data, two answers ${Math.abs(h2 - h1).toFixed(1)} km/s/Mpc apart.`, L, y0 + 48);
+        fillSub(ctx, 'The delay only fixes H_{0}/λ, and the pictures cannot tell you λ.', L, y0 + 66);
+    }
+
+    if ($('mst-more').open) mstKappa();
+
+    // the table: what changes and what doesn't
     const sig = C_KMS * Math.sqrt(PHYS.ARCSEC * d.Ds / (4 * Math.PI * d.Dds));
-    const muA = tA / (tA - 1), muB = tB / (tB + 1), dt = d1 * days;
+    const muA = tA / (tA - 1), muB = tB / (tB + 1);
     const f2 = v => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2);
+    const grp = t => [t];
     const rows = [
+        grp('Identical: no image can tell the two lenses apart'),
         ['Image positions θ<sub>A</sub>, θ<sub>B</sub>', `${f2(tA)}, ${f2(tB)}`, `${f2(tA)}, ${f2(tB)}`, 'same'],
-        ['Source position β', beta.toFixed(2), (lam * beta).toFixed(2), '× λ, never observed'],
-        ['Magnifications μ<sub>A</sub>, μ<sub>B</sub>', `${muA.toFixed(2)}, ${muB.toFixed(2)}`, `${(muA / lam ** 2).toFixed(2)}, ${(muB / lam ** 2).toFixed(2)}`, '× 1/λ²'],
         ['Flux ratio μ<sub>A</sub>/μ<sub>B</sub>', (muA / muB).toFixed(2), (muA / muB).toFixed(2), 'same'],
-        ['Time delay Δ<i>t</i><sub>AB</sub> at <i>H</i><sub>0</sub> = 70', dt.toFixed(1) + ' d', (lam * dt).toFixed(1) + ' d', '× λ'],
-        [`<i>H</i><sub>0</sub> that fits a measured ${dt.toFixed(1)} d`, '70.0', (70 * lam).toFixed(1), '× λ'],
+        grp('Different, but never observed'),
+        ['Source position β', beta.toFixed(2), (lam * beta).toFixed(2), '× λ'],
+        ['Magnifications μ<sub>A</sub>, μ<sub>B</sub>', `${muA.toFixed(2)}, ${muB.toFixed(2)}`, `${(muA / lam ** 2).toFixed(2)}, ${(muB / lam ** 2).toFixed(2)}`, '× 1/λ²'],
+        grp('Different: the delay, and with it <i>H</i><sub>0</sub>'),
+        ['Time delay Δ<i>t</i><sub>AB</sub> at <i>H</i><sub>0</sub> = 70', dt[0].toFixed(1) + ' d', dt[1].toFixed(1) + ' d', '× λ'],
+        [`<b><i>H</i><sub>0</sub> that fits a measured ${dt[0].toFixed(1)} d</b>`, '70.0', `<b>${h2.toFixed(1)}</b>`, '× λ'],
+        grp('Different, and measured on its own: this breaks the tie'),
         ['Stellar velocity dispersion σ<sub>v</sub>', sig.toFixed(0) + ' km/s', (sig * Math.sqrt(lam)).toFixed(0) + ' km/s', '× √λ, roughly'],
     ];
-    $('mst-res').innerHTML = '<thead><tr><th></th><th style="text-align:right">λ = 1</th><th style="text-align:right">λ = ' + lam.toFixed(2) + '</th><th>Change</th></tr></thead><tbody>'
-        + rows.map(r => `<tr><th>${r[0]}</th><td class="v">${r[1]}</td><td class="v">${r[2]}</td><td>${r[3]}</td></tr>`).join('') + '</tbody>';
+    $('mst-res').innerHTML = '<thead><tr><th></th><th style="text-align:right">Lens 1</th><th style="text-align:right">Lens 2</th><th>Change</th></tr></thead><tbody>'
+        + rows.map(r => r.length === 1 ? `<tr class="grp"><th colspan="4">${r[0]}</th></tr>` : `<tr><th>${r[0]}</th><td class="v">${r[1]}</td><td class="v">${r[2]}</td><td>${r[3]}</td></tr>`).join('') + '</tbody>';
+}
+
+// the optional mass profiles: convergence κ (solid) and its mean inside θ (dashed), lens 1 grey, lens 2 blue
+function mstKappa() {
+    const cv = $('mst-kappa'), ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
+    const fg = cssVar('--well-text'), axis = cssVar('--axis'), grid = cssVar('--grid'), col = cssVar('--s1'), warn = cssVar('--accent');
+    const lam = MST.lam;
+    ctx.fillStyle = cssVar('--well'); ctx.fillRect(0, 0, W, H);
+    const x0 = 80, x1 = W - 20, T = 62, Bt = H - 50;
+    const X = v => x0 + v / 3 * (x1 - x0), Y = v => Bt - (v + 0.5) / 2.5 * (Bt - T);
+    ctx.font = '15px Helvetica, Arial, sans-serif'; ctx.lineWidth = 1; ctx.strokeStyle = grid; ctx.fillStyle = axis;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    for (const v of [0, 1, 2, 3]) { ctx.beginPath(); ctx.moveTo(X(v), T); ctx.lineTo(X(v), Bt); ctx.stroke(); ctx.fillText(String(v), X(v), Bt + 6); }
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    for (const v of [-0.5, 0, 0.5, 1, 1.5, 2]) { ctx.beginPath(); ctx.moveTo(x0, Y(v)); ctx.lineTo(x1, Y(v)); ctx.stroke(); ctx.fillText(String(v), x0 - 8, Y(v)); }
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillStyle = fg; fillSub(ctx, 'radius θ / θ_{E}', (x0 + x1) / 2, Bt + 26);
+    ctx.save(); ctx.translate(20, (T + Bt) / 2); ctx.rotate(-Math.PI / 2); ctx.textBaseline = 'middle'; ctx.fillText('convergence κ (surface density)', 0, 0); ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.rect(x0, T, x1 - x0, Bt - T); ctx.clip();
+    ctx.globalAlpha = 0.1; ctx.fillStyle = warn; ctx.fillRect(X(0), Y(0), X(3) - X(0), Y(-0.5) - Y(0)); ctx.globalAlpha = 1;
+    const curve = (fn, color, w, dash) => {
+        ctx.strokeStyle = color; ctx.lineWidth = w; ctx.setLineDash(dash || []); ctx.beginPath();
+        for (let i = 0; i <= 400; i++) { const v = 0.01 + 2.99 * i / 400; ctx[i ? 'lineTo' : 'moveTo'](X(v), Y(fn(v))); }
+        ctx.stroke(); ctx.setLineDash([]);
+    };
+    curve(t => 1 / (2 * t), axis, 2); curve(t => 1 / t, axis, 2, [7, 5]);
+    curve(t => lam / (2 * t) + 1 - lam, col, 3); curve(t => lam / t + 1 - lam, col, 3, [7, 5]);
+    ctx.restore();
+    ctx.strokeStyle = axis; ctx.lineWidth = 1; ctx.strokeRect(x0, T, x1 - x0, Bt - T);
+    ctx.fillStyle = fg; ctx.beginPath(); ctx.arc(X(1), Y(1), 5, 0, 2 * Math.PI); ctx.fill();
+    ctx.font = '15px Helvetica, Arial, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    fillSub(ctx, 'θ_{E}: same mass inside for both', X(1) + 10, Y(1) - 14);
+    ctx.fillStyle = warn; ctx.textAlign = 'right'; ctx.fillText('negative density', X(3) - 8, Y(-0.25));
+    // legend above the plot, clear of the curves: colour = which lens, line style = which quantity
+    const sample = (x, y, color, dash, label) => {
+        ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.setLineDash(dash); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 30, y); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = fg; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(label, x + 38, y);
+    };
+    ctx.font = '14px Helvetica, Arial, sans-serif';
+    sample(x0, 14, axis, [], 'lens 1');
+    sample(x0 + 130, 14, col, [], `lens 2 (λ = ${lam.toFixed(2)})`);
+    sample(x0, 38, fg, [], 'κ at radius θ');
+    sample(x0 + 200, 38, fg, [7, 5], 'mean κ inside θ');
 }
 
 /* =====================================================================
