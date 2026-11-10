@@ -1443,6 +1443,9 @@ class LensRenderer {
     }
     setTexture(src) {
         const gl = this.gl;
+        // Firefox (some Linux GPU backends) uploads a 2D canvas in its internal BGRA order, swapping red
+        // and blue. Read the pixels back on the CPU instead: ImageData is always RGBA
+        if (src instanceof HTMLCanvasElement) src = src.getContext('2d').getImageData(0, 0, src.width, src.height);
         gl.bindTexture(gl.TEXTURE_2D, this.tex);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
